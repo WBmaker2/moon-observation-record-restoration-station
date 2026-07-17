@@ -26,7 +26,7 @@ export default function Home() {
         currentCaseNumber={Math.min(caseIndex + 1, CASES.length)}
         totalCases={CASES.length}
       />
-      <main>
+      <main className="app-main">
         {!modelGuideConfirmed ? (
           <GuidePanel onConfirm={() => setModelGuideConfirmed(true)} />
         ) : caseIndex >= CASES.length ? (
