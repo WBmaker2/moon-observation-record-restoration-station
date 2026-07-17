@@ -43,7 +43,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible { outline: 4px 
 .guide-panel, .case-workspace, .result-summary { padding: clamp(1rem, 3vw, 2rem); border: 2px solid var(--border); border-radius: 1rem; background: var(--paper); box-shadow: var(--shadow); }
 .guide-panel > p:first-child, .case-workspace > p:first-child, .result-summary > p:first-child { margin: 0 0 0.25rem; color: var(--primary); font-size: 0.92rem; font-weight: 800; letter-spacing: 0.03em; }
 h1, h2, p { overflow-wrap: anywhere; }
-h1 { margin: 0; font-family: ui-serif, Georgia, serif; font-size: clamp(1.8rem, 4vw, 2.65rem); line-height: 1.2; }
+h1 { margin: 0; font-family: ui-serif, Georgia, serif; font-size: clamp(29px, 4vw, 2.65rem); line-height: 1.2; }
 h2 { margin: 0; font-size: clamp(1.25rem, 2.4vw, 1.55rem); line-height: 1.3; }
 .guide-panel > p:not(:first-child), .case-workspace > p:not(:first-child), .result-summary > p:not(:first-child) { margin: 0.55rem 0 1.25rem; }
 
@@ -89,7 +89,7 @@ fieldset:disabled { opacity: 0.68; }
 .case-workspace__feedback p { margin: 0.45rem 0 0; }
 .result-summary ol { display: grid; gap: 0.7rem; padding-left: 1.5rem; }
 .result-summary details { padding: 0.65rem; border: 1px solid var(--border); border-radius: 0.6rem; background: var(--paper-soft); }
-.result-summary summary { cursor: pointer; font-weight: 800; }
+.result-summary summary { display: flex; align-items: center; min-height: 44px; padding: 0.45rem 0.25rem; cursor: pointer; font-weight: 800; }
 .result-summary dl { display: grid; gap: 0.25rem; margin: 0.8rem 0 0; }
 .result-summary dt { color: var(--primary); font-weight: 800; }
 .result-summary dd { margin: 0 0 0.45rem; }

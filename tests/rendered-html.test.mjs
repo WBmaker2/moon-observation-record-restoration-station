@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 async function render() {
@@ -35,4 +36,16 @@ test("server-renders the finished moon observation learning app", async () => {
   assert.match(html, /aria-label="안내 메뉴"/);
   assert.match(html, /업데이트 내역/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|Building your site|react-loading-skeleton/i);
+});
+
+test("keeps the primary question heading at least 29px", async () => {
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(css, /h1\s*\{[^}]*font-size:\s*clamp\(29px,\s*4vw,\s*2\.65rem\)/s);
+});
+
+test("gives restoration record summaries a 44px touch target", async () => {
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(css, /\.result-summary summary\s*\{[^}]*display:\s*flex;[^}]*min-height:\s*44px;[^}]*padding:/s);
 });
