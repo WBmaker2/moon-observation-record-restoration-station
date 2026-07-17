@@ -6,7 +6,15 @@ import type {
 } from "./types";
 
 export function sameSet(left: PhaseId[], right: PhaseId[]) {
-  return left.length === right.length && left.every((id) => right.includes(id));
+  const leftSet = new Set(left);
+  const rightSet = new Set(right);
+
+  return (
+    left.length === leftSet.size &&
+    right.length === rightSet.size &&
+    leftSet.size === rightSet.size &&
+    [...leftSet].every((id) => rightSet.has(id))
+  );
 }
 
 export function judgeAnswer(

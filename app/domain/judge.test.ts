@@ -57,4 +57,13 @@ describe("judgeAnswer", () => {
   it("중복된 후보 선택은 같은 집합으로 인정하지 않는다", () => {
     expect(sameSet(["first-quarter"], ["first-quarter", "first-quarter"])).toBe(false);
   });
+
+  it("중복 값 때문에 다른 후보 집합을 같은 집합으로 착각하지 않는다", () => {
+    expect(
+      sameSet(
+        ["waxing-crescent", "waxing-crescent"],
+        ["waxing-crescent", "first-quarter"],
+      ),
+    ).toBe(false);
+  });
 });
