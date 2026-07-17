@@ -11,6 +11,30 @@ type SimpleDialogProps = {
   title: string;
 };
 
+type InertTarget = {
+  element: HTMLElement;
+  wasInert: boolean;
+};
+
+function makeBackgroundInert(dialog: HTMLDialogElement) {
+  const targets: InertTarget[] = [];
+  let child: HTMLElement = dialog;
+
+  while (child.parentElement) {
+    const parent = child.parentElement;
+    for (const sibling of Array.from(parent.children)) {
+      if (sibling === child || !(sibling instanceof HTMLElement)) continue;
+      targets.push({ element: sibling, wasInert: sibling.inert ?? false });
+      sibling.inert = true;
+    }
+    child = parent;
+  }
+
+  return () => {
+    for (const target of targets) target.element.inert = target.wasInert;
+  };
+}
+
 export function SimpleDialog({
   children,
   id,
@@ -20,6 +44,7 @@ export function SimpleDialog({
 }: SimpleDialogProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const restoreBackgroundRef = useRef<() => void>(() => undefined);
   const triggerRef = useRef<HTMLElement | null>(null);
   const [fallbackOpen, setFallbackOpen] = useState(false);
 
@@ -56,6 +81,9 @@ export function SimpleDialog({
     if (typeof dialogRef.current?.showModal === "function") {
       dialogRef.current.showModal();
     } else {
+      if (dialogRef.current) {
+        restoreBackgroundRef.current = makeBackgroundInert(dialogRef.current);
+      }
       setFallbackOpen(true);
     }
     closeButtonRef.current?.focus();
@@ -67,6 +95,7 @@ export function SimpleDialog({
     document.addEventListener("keydown", closeWithEscape);
     return () => {
       document.removeEventListener("keydown", closeWithEscape);
+      restoreBackgroundRef.current();
       triggerRef.current?.focus();
     };
   }, [onClose, returnFocusRef]);
