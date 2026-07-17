@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { ReactNode, RefObject } from "react";
+import type { KeyboardEvent as ReactKeyboardEvent, ReactNode, RefObject } from "react";
 
 type SimpleDialogProps = {
   children: ReactNode;
@@ -22,6 +22,32 @@ export function SimpleDialog({
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
   const [fallbackOpen, setFallbackOpen] = useState(false);
+
+  function trapFocusInFallback(event: ReactKeyboardEvent<HTMLDialogElement>) {
+    if (!fallbackOpen || event.key !== "Tab") return;
+
+    const focusable = Array.from(
+      event.currentTarget.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    );
+    const currentIndex = focusable.indexOf(document.activeElement as HTMLElement);
+
+    if (focusable.length === 0) return;
+    if (currentIndex === -1) {
+      event.preventDefault();
+      focusable[event.shiftKey ? focusable.length - 1 : 0]?.focus();
+      return;
+    }
+    if (event.shiftKey && currentIndex === 0) {
+      event.preventDefault();
+      focusable[focusable.length - 1]?.focus();
+    }
+    if (!event.shiftKey && currentIndex === focusable.length - 1) {
+      event.preventDefault();
+      focusable[0]?.focus();
+    }
+  }
 
   useEffect(() => {
     triggerRef.current = returnFocusRef?.current ?? (document.activeElement instanceof HTMLElement
@@ -48,7 +74,9 @@ export function SimpleDialog({
   return (
     <dialog
       aria-labelledby={`${id}-title`}
+      aria-modal="true"
       className="simple-dialog"
+      onKeyDown={trapFocusInFallback}
       ref={dialogRef}
       onCancel={(event) => {
         event.preventDefault();

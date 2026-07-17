@@ -94,6 +94,27 @@ describe("Home", () => {
     expect(screen.getByText("대표 달 모형을 먼저 살펴봐요")).toBeInTheDocument();
   });
 
+  it("사건 풀이 중 안내를 열고 닫아도 고른 후보와 근거를 유지한다", () => {
+    render(<Home />);
+
+    beginFirstCase();
+    fireEvent.click(
+      screen.getByRole("button", { name: "날짜 순서 확인했어요" }),
+    );
+    const candidate = screen.getByRole("radio", { name: "상현 무렵 반달" });
+    const evidence = screen.getByRole("checkbox", {
+      name: CASES[0].evidence[0].label,
+    });
+    fireEvent.click(candidate);
+    fireEvent.click(evidence);
+
+    fireEvent.click(screen.getByRole("button", { name: "도움말" }));
+    fireEvent.click(screen.getByRole("button", { name: "닫기" }));
+
+    expect(candidate).toBeChecked();
+    expect(evidence).toBeChecked();
+  });
+
   it("업데이트 내역을 보여 주고 다섯 사건을 마치면 읽기 전용 복원 파일을 만든다", () => {
     render(<Home />);
 
