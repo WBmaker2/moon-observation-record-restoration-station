@@ -35,7 +35,11 @@ export default function Home() {
       <p aria-label={`완료한 사건 ${completedCaseIds.length}개`}>
         사건 {caseIndex + 1} / {CASES.length}
       </p>
-      <CaseWorkspace caseData={CASES[caseIndex]} onComplete={completeCase} />
+      <CaseWorkspace
+        caseData={CASES[caseIndex]}
+        key={CASES[caseIndex].id}
+        onComplete={completeCase}
+      />
     </main>
   );
 }
