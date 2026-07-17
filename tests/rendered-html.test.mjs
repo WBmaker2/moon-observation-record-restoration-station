@@ -2,14 +2,18 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-async function render() {
+async function render({ host = "localhost", protocol = "http" } = {}) {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
-    new Request("http://localhost/", {
-      headers: { accept: "text/html" },
+    new Request(`${protocol}://${host}/`, {
+      headers: {
+        accept: "text/html",
+        host,
+        "x-forwarded-proto": protocol,
+      },
     }),
     {
       ASSETS: {
@@ -36,6 +40,23 @@ test("server-renders the finished moon observation learning app", async () => {
   assert.match(html, /aria-label="안내 메뉴"/);
   assert.match(html, /업데이트 내역/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|Building your site|react-loading-skeleton/i);
+});
+
+test("derives absolute OG and X card URLs from the request host", async () => {
+  const response = await render({
+    host: "moon.example.test",
+    protocol: "https",
+  });
+  const html = await response.text();
+
+  assert.match(
+    html,
+    /<meta property="og:image" content="https:\/\/moon\.example\.test\/og\.png"\/>/,
+  );
+  assert.match(
+    html,
+    /<meta name="twitter:image" content="https:\/\/moon\.example\.test\/og\.png"\/>/,
+  );
 });
 
 test("keeps the primary question heading at least 29px", async () => {
