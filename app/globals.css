@@ -98,6 +98,7 @@ body {
 
 .observation-card--cloudy,
 .observation-card--not-observed,
-.observation-card--missing-record {
+.observation-card--missing-record,
+.observation-card--error {
   place-items: start;
 }

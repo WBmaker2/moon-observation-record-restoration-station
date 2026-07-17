@@ -191,13 +191,15 @@ Expected: FAIL because the components are missing.
 - [ ] **Step 3: 위상 모형과 날짜순 목록을 구현한다**
 
 ```tsx
-<svg role="img" aria-label={phase.textAlternative} viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="46" className="moon-outline" />
-  <path d={phase.lightPath} className="moon-light" />
-</svg>
+<div
+  role="img"
+  aria-label={phase.textAlternative}
+  className="moon-phase"
+  data-phase={phase.id}
+/>
 ```
 
-Use fixed reviewed path data for all eight phases, retain the full circular outline, and render cloudy/not-observed/missing states as text cards rather than moon shapes.
+Use fixed reviewed CSS phase geometry for all eight phases, retain the full circular outline, and keep accessible text data-driven from the shared `Phase` record. Render cloudy/not-observed/missing states as text cards rather than moon shapes.
 
 - [ ] **Step 4: 컴포넌트 테스트를 통과시킨다**
 

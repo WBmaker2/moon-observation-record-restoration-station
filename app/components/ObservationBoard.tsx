@@ -32,7 +32,11 @@ export function ObservationBoard({ observations }: ObservationBoardProps) {
         <li className="observation-board__item" key={observation.id}>
           <p className="observation-board__day">{observation.relativeDay + 1}일째</p>
           {observation.status === "observed" ? (
-            observation.phaseId ? <ObservedMoon phaseId={observation.phaseId} /> : null
+            observation.phaseId ? (
+              <ObservedMoon phaseId={observation.phaseId} />
+            ) : (
+              <ObservationErrorCard />
+            )
           ) : (
             <StatusCard status={observation.status} />
           )}
@@ -51,6 +55,15 @@ function ObservedMoon({ phaseId }: { phaseId: NonNullable<Observation["phaseId"]
     <section aria-label={`${phase.studentName} 관측 기록`} className="observation-card observation-card--observed">
       <MoonPhase phaseId={phaseId} size={80} />
       <p>{phase.studentName}</p>
+    </section>
+  );
+}
+
+function ObservationErrorCard() {
+  return (
+    <section className="observation-card observation-card--error" role="alert">
+      <p>관측 기록 오류</p>
+      <p>관측했다고 적혀 있지만 달 모양 기록이 없어요.</p>
     </section>
   );
 }

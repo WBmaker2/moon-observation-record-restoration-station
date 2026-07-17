@@ -23,4 +23,16 @@ describe("ObservationBoard", () => {
       screen.getByRole("img", { name: PHASES[1].textAlternative }),
     ).toBeInTheDocument();
   });
+
+  it("관측됨 상태에 위상 기록이 없으면 명확한 오류 카드를 보여 준다", () => {
+    render(
+      <ObservationBoard
+        observations={[
+          { ...CASES[0].observations[0], id: "observed-without-phase", phaseId: null },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("관측 기록 오류")).toBeInTheDocument();
+  });
 });
