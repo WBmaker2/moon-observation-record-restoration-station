@@ -24,3 +24,80 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.moon-phase {
+  --moon-dark: #2a3144;
+  --moon-light: #f7e7a8;
+  box-sizing: border-box;
+  flex: none;
+  overflow: hidden;
+  border: 2px solid #172033;
+  border-radius: 50%;
+  background-color: var(--moon-dark);
+}
+
+.moon-phase[data-phase="new-near"] {
+  background-image: radial-gradient(circle at 50% 50%, #596176 0 6%, transparent 7%);
+}
+
+.moon-phase[data-phase="waxing-crescent"] {
+  background-image: radial-gradient(circle at 110% 50%, var(--moon-light) 0 58%, transparent 59%);
+}
+
+.moon-phase[data-phase="first-quarter"] {
+  background-image: linear-gradient(to right, transparent 0 50%, var(--moon-light) 50% 100%);
+}
+
+.moon-phase[data-phase="waxing-gibbous"] {
+  background-image: radial-gradient(circle at -3% 50%, var(--moon-dark) 0 48%, transparent 49%), linear-gradient(var(--moon-light), var(--moon-light));
+}
+
+.moon-phase[data-phase="full"] {
+  background-color: var(--moon-light);
+}
+
+.moon-phase[data-phase="waning-gibbous"] {
+  background-image: radial-gradient(circle at 103% 50%, var(--moon-dark) 0 48%, transparent 49%), linear-gradient(var(--moon-light), var(--moon-light));
+}
+
+.moon-phase[data-phase="third-quarter"] {
+  background-image: linear-gradient(to right, var(--moon-light) 0 50%, transparent 50% 100%);
+}
+
+.moon-phase[data-phase="waning-crescent"] {
+  background-image: radial-gradient(circle at -10% 50%, var(--moon-light) 0 58%, transparent 59%);
+}
+
+.observation-board {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.observation-board__item {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.observation-board__day,
+.observation-card p {
+  margin: 0;
+}
+
+.observation-card {
+  display: grid;
+  gap: 0.5rem;
+  place-items: center;
+  min-height: 7rem;
+  padding: 0.75rem;
+  border: 1px solid #9aa3b5;
+  border-radius: 0.75rem;
+}
+
+.observation-card--cloudy,
+.observation-card--not-observed,
+.observation-card--missing-record {
+  place-items: start;
+}
