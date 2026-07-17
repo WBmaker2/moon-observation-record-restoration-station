@@ -52,6 +52,13 @@ export type Certainty =
   | "multiple-possible"
   | "not-enough-information";
 
+export type TrendChoiceId = Trend | "insufficient-data";
+
+export interface TrendChoice {
+  id: TrendChoiceId;
+  label: string;
+}
+
 export interface RestorationCase {
   id: string;
   title: string;
@@ -61,6 +68,9 @@ export interface RestorationCase {
   acceptedCandidateSets: PhaseId[][];
   evidence: Evidence[];
   certainty: Certainty;
+  trendChoices: TrendChoice[];
+  successCopy: string;
+  retryCopy: string;
 }
 
 export interface CaseAnswer {

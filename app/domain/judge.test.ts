@@ -2,6 +2,12 @@ import { describe, expect, it } from "vitest";
 import type { CaseAnswer, RestorationCase } from "./types";
 import { judgeAnswer, sameSet } from "./judge";
 
+const presentation = {
+  trendChoices: [{ id: "growing" as const, label: "밝은 부분이 커지는 중이에요" }],
+  successCopy: "복원했어요.",
+  retryCopy: "앞뒤 기록을 살펴보세요.",
+};
+
 const multipleCase: RestorationCase = {
   id: "multiple-case",
   title: "여러 모양이 가능한 기록",
@@ -14,6 +20,7 @@ const multipleCase: RestorationCase = {
     { id: "after-not-full", side: "after", label: "뒤 기록은 아직 보름달이 아니에요." },
   ],
   certainty: "multiple-possible",
+  ...presentation,
 };
 
 const singleCase: RestorationCase = {
@@ -28,6 +35,7 @@ const singleCase: RestorationCase = {
     { id: "after-not-full", side: "after", label: "뒤 기록 근거" },
   ],
   certainty: "one-best",
+  ...presentation,
 };
 
 const oneSidedAnswer: CaseAnswer = {
