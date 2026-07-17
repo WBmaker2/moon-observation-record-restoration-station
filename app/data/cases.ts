@@ -4,8 +4,8 @@ import { PHASES } from "./phases";
 const TREND_CHOICES: TrendChoice[] = [
   { id: "growing", label: "지구에서 밝게 보이는 부분이 커지는 중이에요" },
   { id: "shrinking", label: "지구에서 밝게 보이는 부분이 작아지는 중이에요" },
-  { id: "turning-full", label: "보름 무렵에서 방향이 바뀌어요" },
-  { id: "insufficient-data", label: "기록만으로 하나를 정하기 어려워요" },
+  { id: "full-turn", label: "지구에서 밝게 보이는 부분의 변화 방향이 바뀌는 지점이에요" },
+  { id: "insufficient", label: "기록만으로 하나를 정하기 어려워요" },
 ];
 
 const orientation = "normalized-northern-model" as const;
@@ -27,6 +27,7 @@ const risingGapCase: RestorationCase = {
   ],
   certainty: "one-best",
   trendChoices: TREND_CHOICES,
+  acceptedTrendChoiceIds: ["growing"],
   successCopy: "앞뒤 기록을 모두 사용해 상현 무렵 반달로 복원했어요.",
   retryCopy: "밝은 쪽의 방향 하나가 아니라, 앞뒤 기록을 보고 지구에서 밝게 보이는 부분이 어떻게 변하는지 살펴보세요.",
 };
@@ -48,6 +49,7 @@ const afterFullCase: RestorationCase = {
   ],
   certainty: "one-best",
   trendChoices: TREND_CHOICES,
+  acceptedTrendChoiceIds: ["shrinking"],
   successCopy: "보름 뒤에는 지구에서 밝게 보이는 부분이 작아져요. 이 기록은 보름 뒤 이지러지는 달이에요.",
   retryCopy: "달 자체가 작아지는 것이 아니에요. 지구에서 밝게 보이는 부분의 변화를 비교해 보세요.",
 };
@@ -69,6 +71,7 @@ const fullTurnCase: RestorationCase = {
   ],
   certainty: "one-best",
   trendChoices: TREND_CHOICES,
+  acceptedTrendChoiceIds: ["full-turn"],
   successCopy: "보름달은 지구에서 밝게 보이는 부분이 커지는 흐름과 작아지는 흐름이 바뀌는 대표 지점이에요.",
   retryCopy: "앞 기록과 뒤 기록의 변화 방향을 함께 읽어 보세요. 보름 무렵에서는 방향이 바뀔 수 있어요.",
 };
@@ -90,6 +93,7 @@ const cloudyCycleCase: RestorationCase = {
   ],
   certainty: "one-best",
   trendChoices: TREND_CHOICES,
+  acceptedTrendChoiceIds: ["full-turn"],
   successCopy: "그믐 모양과 밝아지는 초승 모양 사이의 대표 모양은 삭 무렵이에요.",
   retryCopy: "그날은 구름 때문에 관측하지 못했어요. 달이 없었다는 뜻은 아니에요. 앞뒤 순서로 복원해 보세요.",
 };
@@ -111,6 +115,7 @@ const multiplePossibleCase: RestorationCase = {
   ],
   certainty: "multiple-possible",
   trendChoices: TREND_CHOICES,
+  acceptedTrendChoiceIds: ["insufficient"],
   successCopy: "자료가 부족할 때에는 가능한 모양을 여러 개 남기는 것이 더 과학적인 판단이에요.",
   retryCopy: "자료가 띄엄띄엄 있어요. 다른 모양도 앞뒤 기록과 맞을 수 있어요.",
 };
@@ -197,8 +202,23 @@ export function validateCases(cases: RestorationCase[]): string[] {
     if (evidenceIds.size !== caseData.evidence.length || beforeEvidence.length !== 1 || afterEvidence.length !== 1) {
       errors.push(`${prefix} 앞과 뒤 근거를 각각 하나씩 제공해야 합니다.`);
     }
-    if (caseData.trendChoices.length === 0 || !caseData.successCopy.trim() || !caseData.retryCopy.trim()) {
+    const trendChoiceIds = new Set(caseData.trendChoices.map((choice) => choice.id));
+    if (
+      caseData.trendChoices.length === 0 ||
+      trendChoiceIds.size !== caseData.trendChoices.length ||
+      !caseData.successCopy.trim() ||
+      !caseData.retryCopy.trim()
+    ) {
       errors.push(`${prefix} 변화 방향 선택지와 성공 및 다시 생각하기 문구를 제공해야 합니다.`);
+    }
+    const acceptedTrendChoiceIds = caseData.acceptedTrendChoiceIds ?? [];
+    if (acceptedTrendChoiceIds.length === 0) {
+      errors.push(`${prefix} 허용 변화 방향을 하나 이상 제공해야 합니다.`);
+    } else if (
+      new Set(acceptedTrendChoiceIds).size !== acceptedTrendChoiceIds.length ||
+      !acceptedTrendChoiceIds.every((trendId) => trendChoiceIds.has(trendId))
+    ) {
+      errors.push(`${prefix} 허용 변화 방향은 변화 방향 선택지의 부분집합이어야 합니다.`);
     }
   }
 

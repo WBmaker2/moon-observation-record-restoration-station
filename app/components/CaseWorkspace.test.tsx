@@ -25,6 +25,24 @@ function selectAllEvidence(caseIndex: number) {
   }
 }
 
+function selectAcceptedTrend(caseIndex: number) {
+  const acceptedTrendChoiceIds = [
+    ["growing"],
+    ["shrinking"],
+    ["full-turn"],
+    ["full-turn"],
+    ["insufficient"],
+  ][caseIndex];
+  const trendChoice = CASES[caseIndex].trendChoices.find(
+    (choice) => acceptedTrendChoiceIds.includes(choice.id),
+  );
+  if (!trendChoice) throw new Error("변화 방향 선택지를 찾지 못했습니다.");
+
+  fireEvent.click(
+    screen.getByRole("radio", { name: `변화 방향: ${trendChoice.label}` }),
+  );
+}
+
 describe("GuidePanel", () => {
   it("대표 모형의 모든 한계를 확인해야 첫 사건을 시작할 수 있다", () => {
     const onConfirm = vi.fn();
@@ -43,7 +61,7 @@ describe("GuidePanel", () => {
 });
 
 describe("CaseWorkspace", () => {
-  it("날짜 순서, 후보, 앞뒤 근거와 확실성을 모두 확인해 단일 답 사건을 완료한다", () => {
+  it("정답을 확인한 뒤 성공 안내를 유지하고 다음 버튼으로만 완료를 전달한다", () => {
     const onComplete = vi.fn();
     render(<CaseWorkspace caseData={CASES[0]} onComplete={onComplete} />);
 
@@ -55,14 +73,31 @@ describe("CaseWorkspace", () => {
     confirmOrder();
     fireEvent.click(candidate);
     selectAllEvidence(0);
+    selectAcceptedTrend(0);
     fireEvent.click(
       screen.getByRole("radio", { name: "하나가 가장 알맞아요" }),
     );
     fireEvent.click(screen.getByRole("button", { name: "복원 확인하기" }));
 
-    expect(onComplete).toHaveBeenCalledWith(CASES[0].id);
+    expect(onComplete).not.toHaveBeenCalled();
     expect(screen.getByText(CASES[0].successCopy)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: CASES[0].title })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "다음 사건으로" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "복원 확인하기" })).toBeDisabled();
+    expect(candidate).toBeDisabled();
     expect(screen.queryByText(/점수/)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "다음 사건으로" }));
+
+    expect(onComplete).toHaveBeenCalledWith(
+      CASES[0].id,
+      expect.objectContaining({
+        candidateIds: ["first-quarter"],
+        evidenceIds: CASES[0].evidence.map((evidence) => evidence.id),
+        certainty: "one-best",
+        trendId: "growing",
+      }),
+    );
   });
 
   it("후보를 바꾸면 근거와 확실성 선택을 초기화한다", () => {
@@ -73,6 +108,7 @@ describe("CaseWorkspace", () => {
       screen.getByRole("radio", { name: "상현 무렵 반달" }),
     );
     selectAllEvidence(0);
+    selectAcceptedTrend(0);
     fireEvent.click(
       screen.getByRole("radio", { name: "하나가 가장 알맞아요" }),
     );
@@ -86,6 +122,11 @@ describe("CaseWorkspace", () => {
     expect(
       screen.getByRole("radio", { name: "하나가 가장 알맞아요" }),
     ).not.toBeChecked();
+    expect(
+      screen.getByRole("radio", {
+        name: "변화 방향: 지구에서 밝게 보이는 부분이 커지는 중이에요",
+      }),
+    ).not.toBeChecked();
 
     fireEvent.click(screen.getByRole("button", { name: "복원 확인하기" }));
     expect(
@@ -96,7 +137,30 @@ describe("CaseWorkspace", () => {
     ).toBeInTheDocument();
   });
 
-  it("각 방향에서 근거를 하나씩 고르면 추가 근거를 모두 고르지 않아도 확실성을 판단할 수 있다", () => {
+  it("변화 방향을 빼거나 틀리게 고르면 완료하지 않고 안내한다", () => {
+    const onComplete = vi.fn();
+    render(<CaseWorkspace caseData={CASES[0]} onComplete={onComplete} />);
+
+    confirmOrder();
+    fireEvent.click(screen.getByRole("radio", { name: "상현 무렵 반달" }));
+    selectAllEvidence(0);
+    fireEvent.click(
+      screen.getByRole("radio", {
+        name: "변화 방향: 지구에서 밝게 보이는 부분이 작아지는 중이에요",
+      }),
+    );
+    fireEvent.click(
+      screen.getByRole("radio", { name: "하나가 가장 알맞아요" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "복원 확인하기" }));
+
+    expect(onComplete).not.toHaveBeenCalled();
+    expect(
+      screen.getByText("앞뒤 기록에서 밝게 보이는 부분이 어떻게 변하는지 골라 보세요."),
+    ).toBeInTheDocument();
+  });
+
+  it("각 방향에서 근거를 하나씩 고르면 변화 방향을 고르고 확실성을 판단할 수 있다", () => {
     const caseData = {
       ...CASES[0],
       evidence: [
@@ -122,6 +186,17 @@ describe("CaseWorkspace", () => {
     );
 
     expect(
+      screen.getByRole("radio", {
+        name: "변화 방향: 지구에서 밝게 보이는 부분이 커지는 중이에요",
+      }),
+    ).toBeEnabled();
+    expect(
+      screen.getByRole("radio", { name: "하나가 가장 알맞아요" }),
+    ).toBeDisabled();
+
+    selectAcceptedTrend(0);
+
+    expect(
       screen.getByRole("radio", { name: "하나가 가장 알맞아요" }),
     ).toBeEnabled();
   });
@@ -140,11 +215,16 @@ describe("CaseWorkspace", () => {
       fireEvent.click(screen.getByRole("checkbox", { name: phaseName }));
     }
     selectAllEvidence(4);
+    selectAcceptedTrend(4);
     fireEvent.click(
       screen.getByRole("radio", { name: "여러 모양이 가능해요" }),
     );
     fireEvent.click(screen.getByRole("button", { name: "복원 확인하기" }));
+    fireEvent.click(screen.getByRole("button", { name: "다음 사건으로" }));
 
-    expect(onComplete).toHaveBeenCalledWith(caseData.id);
+    expect(onComplete).toHaveBeenCalledWith(
+      caseData.id,
+      expect.objectContaining({ trendId: "insufficient" }),
+    );
   });
 });

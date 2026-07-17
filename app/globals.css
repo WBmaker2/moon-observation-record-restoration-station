@@ -30,12 +30,13 @@ button, input { font: inherit; }
 button, [role="button"] { min-height: 44px; border: 2px solid transparent; border-radius: 0.65rem; padding: 0.55rem 0.85rem; color: #fff; font-weight: 750; cursor: pointer; background: var(--primary); }
 button:hover:not(:disabled) { filter: brightness(1.12); }
 button:disabled { cursor: not-allowed; opacity: 0.58; }
-button:focus-visible, input:focus-visible, summary:focus-visible { outline: 4px solid var(--focus); outline-offset: 3px; }
+button:focus-visible, input:focus-visible, summary:focus-visible, h1:focus-visible { outline: 4px solid var(--focus); outline-offset: 3px; }
 
 .app-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: min(1120px, calc(100% - 2rem)); margin: 0 auto; padding: 1.1rem 0; color: #fff; }
 .app-header p { margin: 0; }
 .app-header p:first-child { color: var(--moon); font-family: ui-serif, Georgia, serif; font-size: clamp(1.2rem, 2vw, 1.55rem); font-weight: 800; }
-.app-header p + p { font-size: 0.94rem; opacity: 0.86; }
+.app-header__subtitle { font-size: 0.94rem; font-weight: 700; }
+.app-header p + p:not(.app-header__subtitle) { font-size: 0.94rem; opacity: 0.86; }
 .app-header nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.45rem; }
 .app-header nav button { min-height: 44px; padding-inline: 0.65rem; border-color: rgb(255 245 221 / 50%); color: var(--paper); background: transparent; font-size: 0.9rem; }
 .app-main { width: min(1120px, calc(100% - 2rem)); margin: 0 auto 3rem; }

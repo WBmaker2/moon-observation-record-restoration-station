@@ -37,6 +37,7 @@ test("server-renders the finished moon observation learning app", async () => {
   assert.match(html, /<title>달 관측 기록 복원소<\/title>/i);
   assert.match(html, /앞뒤 관측 기록을 근거로 사라진 달 모양을 복원하는 초등 과학 학습 앱/);
   assert.match(html, /대표 달 모형을 먼저 살펴봐요/);
+  assert.match(html, /앞뒤 기록을 살펴 사라진 달 모양을 찾아요/);
   assert.match(html, /aria-label="안내 메뉴"/);
   assert.match(html, /업데이트 내역/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|Building your site|react-loading-skeleton/i);
@@ -63,6 +64,12 @@ test("keeps the primary question heading at least 29px", async () => {
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
   assert.match(css, /h1\s*\{[^}]*font-size:\s*clamp\(29px,\s*4vw,\s*2\.65rem\)/s);
+});
+
+test("shows a visible focus marker for programmatically focused primary headings", async () => {
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(css, /h1:focus-visible\s*\{[^}]*outline:\s*4px solid var\(--focus\)/s);
 });
 
 test("gives restoration record summaries a 44px touch target", async () => {

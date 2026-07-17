@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { CASES } from "./data/cases";
 import { PHASES } from "./data/phases";
@@ -14,19 +14,25 @@ function beginFirstCase() {
 }
 
 function completeFirstCase() {
-  fireEvent.click(
-    screen.getByRole("button", { name: "날짜 순서 확인했어요" }),
+  completeCurrentCase(0);
+}
+
+function selectAcceptedTrend(caseIndex: number) {
+  const acceptedTrendChoiceIds = [
+    ["growing"],
+    ["shrinking"],
+    ["full-turn"],
+    ["full-turn"],
+    ["insufficient"],
+  ][caseIndex];
+  const trendChoice = CASES[caseIndex].trendChoices.find(
+    (choice) => acceptedTrendChoiceIds.includes(choice.id),
   );
+  if (!trendChoice) throw new Error("변화 방향 선택지를 찾지 못했습니다.");
+
   fireEvent.click(
-    screen.getByRole("radio", { name: "상현 무렵 반달" }),
+    screen.getByRole("radio", { name: `변화 방향: ${trendChoice.label}` }),
   );
-  for (const evidence of CASES[0].evidence) {
-    fireEvent.click(screen.getByRole("checkbox", { name: evidence.label }));
-  }
-  fireEvent.click(
-    screen.getByRole("radio", { name: "하나가 가장 알맞아요" }),
-  );
-  fireEvent.click(screen.getByRole("button", { name: "복원 확인하기" }));
 }
 
 function completeCurrentCase(caseIndex: number) {
@@ -34,7 +40,6 @@ function completeCurrentCase(caseIndex: number) {
   fireEvent.click(
     screen.getByRole("button", { name: "날짜 순서 확인했어요" }),
   );
-
   for (const candidateId of caseData.acceptedCandidateSets[0]) {
     const phase = PHASES.find((item) => item.id === candidateId);
     if (!phase) throw new Error("대표 달 모형을 찾지 못했습니다.");
@@ -47,6 +52,7 @@ function completeCurrentCase(caseIndex: number) {
   for (const evidence of caseData.evidence) {
     fireEvent.click(screen.getByRole("checkbox", { name: evidence.label }));
   }
+  selectAcceptedTrend(caseIndex);
   fireEvent.click(
     screen.getByRole("radio", {
       name:
@@ -56,6 +62,11 @@ function completeCurrentCase(caseIndex: number) {
     }),
   );
   fireEvent.click(screen.getByRole("button", { name: "복원 확인하기" }));
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: caseIndex === CASES.length - 1 ? "전체 복원 파일 보기" : "다음 사건으로",
+    }),
+  );
 }
 
 describe("Home", () => {
@@ -74,6 +85,14 @@ describe("Home", () => {
     expect(
       screen.getByRole("radio", { name: "보름 뒤 이지러지는 달" }),
     ).toBeDisabled();
+  });
+
+  it("앱 이름 아래에 학습 목표 부제를 보여 준다", () => {
+    render(<Home />);
+
+    expect(
+      screen.getByText("앞뒤 기록을 살펴 사라진 달 모양을 찾아요"),
+    ).toBeInTheDocument();
   });
 
   it("도움말과 교사용 안내를 열고 닫아도 현재 사건 상태와 초점이 유지된다", () => {
@@ -115,10 +134,38 @@ describe("Home", () => {
     expect(evidence).toBeChecked();
   });
 
+  it("화면을 전환할 때만 새 기본 제목으로 초점을 옮긴다", async () => {
+    render(<Home />);
+
+    beginFirstCase();
+    expect(screen.getByRole("heading", { name: CASES[0].title })).toHaveFocus();
+    await act(async () => {});
+    fireEvent.click(
+      screen.getByRole("button", { name: "날짜 순서 확인했어요" }),
+    );
+
+    const candidate = screen.getByRole("radio", { name: "상현 무렵 반달" });
+    candidate.focus();
+    fireEvent.click(candidate);
+    expect(candidate).toHaveFocus();
+
+    completeCurrentCase(0);
+    expect(screen.getByRole("heading", { name: CASES[1].title })).toHaveFocus();
+
+    for (let index = 1; index < CASES.length; index += 1) {
+      completeCurrentCase(index);
+    }
+
+    expect(
+      screen.getByRole("heading", { name: "달 기록 복원 파일" }),
+    ).toHaveFocus();
+  });
+
   it("업데이트 내역을 보여 주고 다섯 사건을 마치면 읽기 전용 복원 파일을 만든다", () => {
     render(<Home />);
 
     fireEvent.click(screen.getByRole("button", { name: "업데이트 내역" }));
+    expect(screen.getByText("2026-07-17 · v1.0.1")).toBeInTheDocument();
     expect(screen.getByText("2026-07-17 · v1.0.0")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "닫기" }));
 
@@ -131,6 +178,10 @@ describe("Home", () => {
     expect(screen.getByText("5개의 사건을 복원했어요.")).toBeInTheDocument();
     expect(screen.getAllByText("앞 기록 근거")).toHaveLength(CASES.length);
     expect(screen.getAllByText("뒤 기록 근거")).toHaveLength(CASES.length);
+    expect(screen.getAllByText("변화 방향")).toHaveLength(CASES.length);
+    expect(
+      screen.getByText("지구에서 밝게 보이는 부분이 작아지는 중이에요"),
+    ).toBeInTheDocument();
     expect(screen.queryByText(/점수|걸린 시간/)).not.toBeInTheDocument();
   });
 });

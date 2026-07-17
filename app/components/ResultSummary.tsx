@@ -1,9 +1,16 @@
+import type { Ref } from "react";
 import { PHASES } from "../data/phases";
-import type { Observation, RestorationCase } from "../domain/types";
+import type {
+  CaseAnswer,
+  CompletedCase,
+  Observation,
+  RestorationCase,
+} from "../domain/types";
 
 type ResultSummaryProps = {
   cases: RestorationCase[];
-  completedCaseIds: string[];
+  completedCases: CompletedCase[];
+  headingRef?: Ref<HTMLHeadingElement>;
 };
 
 const certaintyText = {
@@ -23,22 +30,39 @@ function originalRecord(observation: Observation) {
   return "비어 있던 기록";
 }
 
-function restoredRecord(caseData: RestorationCase) {
-  const candidates = caseData.acceptedCandidateSets[0] ?? [];
-  return candidates.map((candidateId) => phaseName(candidateId)).join(", ");
+function restoredRecord(answer: CaseAnswer) {
+  return answer.candidateIds.map((candidateId) => phaseName(candidateId)).join(", ");
 }
 
-export function ResultSummary({ cases, completedCaseIds }: ResultSummaryProps) {
-  const completedCases = cases.filter((caseData) => completedCaseIds.includes(caseData.id));
+function selectedEvidence(
+  caseData: RestorationCase,
+  answer: CaseAnswer,
+  side: "before" | "after",
+) {
+  return caseData.evidence
+    .filter((evidence) => evidence.side === side && answer.evidenceIds.includes(evidence.id))
+    .map((evidence) => evidence.label)
+    .join(", ");
+}
+
+function selectedTrend(caseData: RestorationCase, answer: CaseAnswer) {
+  return caseData.trendChoices.find((choice) => choice.id === answer.trendId)?.label ?? "선택하지 않음";
+}
+
+export function ResultSummary({ cases, completedCases, headingRef }: ResultSummaryProps) {
+  const completedRecords = cases.flatMap((caseData) => {
+    const record = completedCases.find((item) => item.caseId === caseData.id);
+    return record ? [{ caseData, answer: record.answer }] : [];
+  });
 
   return (
     <section aria-labelledby="result-summary-title" className="result-summary">
       <p>완료 요약</p>
-      <h1 id="result-summary-title">달 기록 복원 파일</h1>
-      <p>{completedCases.length}개의 사건을 복원했어요.</p>
+      <h1 id="result-summary-title" ref={headingRef} tabIndex={-1}>달 기록 복원 파일</h1>
+      <p>{completedRecords.length}개의 사건을 복원했어요.</p>
       <p>앞뒤 기록으로 찾은 내용을 다시 살펴볼 수 있어요.</p>
       <ol aria-label="완료한 복원 기록">
-        {completedCases.map((caseData) => (
+        {completedRecords.map(({ caseData, answer }) => (
           <li key={caseData.id}>
             <details>
               <summary>{caseData.title} 기록 보기</summary>
@@ -46,13 +70,15 @@ export function ResultSummary({ cases, completedCaseIds }: ResultSummaryProps) {
                 <dt>원래 기록</dt>
                 <dd>{caseData.observations.map(originalRecord).join(" → ")}</dd>
                 <dt>복원된 기록</dt>
-                <dd>{restoredRecord(caseData)}</dd>
+                <dd>{restoredRecord(answer)}</dd>
                 <dt>앞 기록 근거</dt>
-                <dd>{caseData.evidence.find((item) => item.side === "before")?.label}</dd>
+                <dd>{selectedEvidence(caseData, answer, "before")}</dd>
                 <dt>뒤 기록 근거</dt>
-                <dd>{caseData.evidence.find((item) => item.side === "after")?.label}</dd>
+                <dd>{selectedEvidence(caseData, answer, "after")}</dd>
+                <dt>변화 방향</dt>
+                <dd>{selectedTrend(caseData, answer)}</dd>
                 <dt>확실성</dt>
-                <dd>{certaintyText[caseData.certainty]}</dd>
+                <dd>{certaintyText[answer.certainty]}</dd>
               </dl>
             </details>
           </li>

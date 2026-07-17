@@ -30,13 +30,18 @@ export function judgeAnswer(
   const after = caseData.evidence.some(
     (item) => item.side === "after" && answer.evidenceIds.includes(item.id),
   );
+  const trend =
+    answer.trendId !== null &&
+    answer.trendId !== undefined &&
+    caseData.acceptedTrendChoiceIds.includes(answer.trendId);
   const certainty = answer.certainty === caseData.certainty;
 
   return {
-    complete: accepted && before && after && certainty,
+    complete: accepted && before && after && trend && certainty,
     accepted,
     before,
     after,
+    trend,
     certainty,
   };
 }

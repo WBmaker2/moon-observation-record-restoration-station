@@ -23,6 +23,32 @@ describe("CASES", () => {
     expect(validateCases(CASES)).toEqual([]);
   });
 
+  it("각 사건은 선택지 안에 있는 허용 변화 방향을 하나 이상 제공한다", () => {
+    for (const caseData of CASES) {
+      const acceptedTrendChoiceIds = (
+        caseData as unknown as { acceptedTrendChoiceIds?: string[] }
+      ).acceptedTrendChoiceIds;
+
+      expect(acceptedTrendChoiceIds).toEqual(expect.any(Array));
+      expect(acceptedTrendChoiceIds?.length).toBeGreaterThan(0);
+      expect(
+        acceptedTrendChoiceIds?.every((trendId) =>
+          caseData.trendChoices.some((choice) => choice.id === trendId),
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it("사건의 앞뒤 기록에 맞는 변화 방향을 허용한다", () => {
+    expect(CASES.map((caseData) => caseData.acceptedTrendChoiceIds)).toEqual([
+      ["growing"],
+      ["shrinking"],
+      ["full-turn"],
+      ["full-turn"],
+      ["insufficient"],
+    ]);
+  });
+
   it("복수 가능 사건은 두 후보를 함께 남기고 자료 부족을 설명한다", () => {
     const caseData = CASES[4];
 
@@ -117,6 +143,25 @@ describe("validateCases", () => {
 
     expect(validateCases(invalidCases)).toContain(
       "rising-gap: 단일 답 사건은 허용 후보 집합을 정확히 하나 제공해야 합니다.",
+    );
+  });
+
+  it("허용 변화 방향이 없거나 선택지 밖이면 거절한다", () => {
+    const missingTrendCases = structuredClone(CASES) as Array<
+      (typeof CASES)[number] & { acceptedTrendChoiceIds?: string[] }
+    >;
+    delete missingTrendCases[0].acceptedTrendChoiceIds;
+
+    const unknownTrendCases = structuredClone(CASES) as Array<
+      (typeof CASES)[number] & { acceptedTrendChoiceIds?: string[] }
+    >;
+    unknownTrendCases[0].acceptedTrendChoiceIds = ["unknown-trend"];
+
+    expect(validateCases(missingTrendCases)).toContain(
+      "rising-gap: 허용 변화 방향을 하나 이상 제공해야 합니다.",
+    );
+    expect(validateCases(unknownTrendCases)).toContain(
+      "rising-gap: 허용 변화 방향은 변화 방향 선택지의 부분집합이어야 합니다.",
     );
   });
 });

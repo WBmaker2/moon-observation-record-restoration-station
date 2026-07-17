@@ -4,6 +4,7 @@ import { judgeAnswer, sameSet } from "./judge";
 
 const presentation = {
   trendChoices: [{ id: "growing" as const, label: "밝은 부분이 커지는 중이에요" }],
+  acceptedTrendChoiceIds: ["growing" as const],
   successCopy: "복원했어요.",
   retryCopy: "앞뒤 기록을 살펴보세요.",
 };
@@ -41,14 +42,25 @@ const singleCase: RestorationCase = {
 const oneSidedAnswer: CaseAnswer = {
   candidateIds: ["first-quarter"],
   evidenceIds: ["before-growing"],
+  trendId: null,
   certainty: "one-best",
 };
+
+function completeAnswerWithTrend(trendId?: string): CaseAnswer {
+  return {
+    candidateIds: ["first-quarter"],
+    evidenceIds: ["before-growing", "after-not-full"],
+    certainty: "one-best",
+    trendId,
+  } as unknown as CaseAnswer;
+}
 
 describe("judgeAnswer", () => {
   it("선택 순서와 상관없이 복수 후보 집합을 인정한다", () => {
     const result = judgeAnswer(multipleCase, {
       candidateIds: ["first-quarter", "waxing-crescent"],
       evidenceIds: ["before-growing", "after-not-full"],
+      trendId: "growing",
       certainty: "multiple-possible",
     });
 
@@ -60,6 +72,22 @@ describe("judgeAnswer", () => {
     expect(judgeAnswer(singleCase, oneSidedAnswer).complete).toBe(false);
     expect(judgeAnswer(singleCase, oneSidedAnswer).before).toBe(true);
     expect(judgeAnswer(singleCase, oneSidedAnswer).after).toBe(false);
+  });
+
+  it("변화 방향을 고르지 않으면 다른 답이 맞아도 완료하지 않는다", () => {
+    expect(judgeAnswer(singleCase, completeAnswerWithTrend()).complete).toBe(false);
+  });
+
+  it("허용하지 않은 변화 방향이면 완료하지 않는다", () => {
+    expect(
+      judgeAnswer(singleCase, completeAnswerWithTrend("shrinking")).complete,
+    ).toBe(false);
+  });
+
+  it("허용한 변화 방향까지 고르면 완료한다", () => {
+    expect(
+      judgeAnswer(singleCase, completeAnswerWithTrend("growing")).complete,
+    ).toBe(true);
   });
 
   it("중복된 후보 선택은 같은 집합으로 인정하지 않는다", () => {

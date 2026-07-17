@@ -36,6 +36,12 @@ const dialogContent = {
     title: "업데이트 내역",
     body: (
       <>
+        <p>2026-07-17 · v1.0.1</p>
+        <ul>
+          <li>변화 방향 선택을 복원 과정과 결과 파일에 더했어요.</li>
+          <li>정답을 확인한 뒤 다음 사건으로 갈지 직접 고를 수 있어요.</li>
+          <li>화면을 바꿀 때 새 제목으로 초점을 옮기고 학습 목표를 더 또렷하게 보여 줘요.</li>
+        </ul>
         <p>2026-07-17 · v1.0.0</p>
         <ul>
           <li>달 관측 기록 복원 사건 5개를 처음 만들었어요.</li>
@@ -65,6 +71,7 @@ export function AppHeader({
       <header className="app-header">
         <div>
           <p>달 관측 기록 복원소</p>
+          <p className="app-header__subtitle">앞뒤 기록을 살펴 사라진 달 모양을 찾아요</p>
           <p aria-live="polite">
             사건 {currentCaseNumber} / {totalCases} · 완료 {completedCount}개
           </p>

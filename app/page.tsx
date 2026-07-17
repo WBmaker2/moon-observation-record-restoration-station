@@ -1,28 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { AppHeader } from "./components/AppHeader";
 import { CaseWorkspace } from "./components/CaseWorkspace";
 import { GuidePanel } from "./components/GuidePanel";
 import { ResultSummary } from "./components/ResultSummary";
 import { CASES } from "./data/cases";
+import type { CaseAnswer, CompletedCase } from "./domain/types";
 
 export default function Home() {
   const [modelGuideConfirmed, setModelGuideConfirmed] = useState(false);
   const [caseIndex, setCaseIndex] = useState(0);
-  const [completedCaseIds, setCompletedCaseIds] = useState<string[]>([]);
+  const [completedCases, setCompletedCases] = useState<CompletedCase[]>([]);
+  const primaryHeadingRef = useRef<HTMLHeadingElement>(null);
+  const lastFocusedCaseIndex = useRef<number | null>(null);
 
-  function completeCase(caseId: string) {
-    setCompletedCaseIds((current) =>
-      current.includes(caseId) ? current : [...current, caseId],
-    );
+  useLayoutEffect(() => {
+    if (!modelGuideConfirmed || lastFocusedCaseIndex.current === caseIndex) return;
+    lastFocusedCaseIndex.current = caseIndex;
+    primaryHeadingRef.current?.focus();
+  }, [caseIndex, modelGuideConfirmed]);
+
+  function completeCase(caseId: string, answer: CaseAnswer) {
+    setCompletedCases((current) => {
+      const otherCases = current.filter((completedCase) => completedCase.caseId !== caseId);
+      return [...otherCases, { caseId, answer }];
+    });
     setCaseIndex((current) => Math.min(current + 1, CASES.length));
   }
 
   return (
     <>
       <AppHeader
-        completedCount={completedCaseIds.length}
+        completedCount={completedCases.length}
         currentCaseNumber={Math.min(caseIndex + 1, CASES.length)}
         totalCases={CASES.length}
       />
@@ -30,10 +40,16 @@ export default function Home() {
         {!modelGuideConfirmed ? (
           <GuidePanel onConfirm={() => setModelGuideConfirmed(true)} />
         ) : caseIndex >= CASES.length ? (
-          <ResultSummary cases={CASES} completedCaseIds={completedCaseIds} />
+          <ResultSummary
+            cases={CASES}
+            completedCases={completedCases}
+            headingRef={primaryHeadingRef}
+          />
         ) : (
           <CaseWorkspace
             caseData={CASES[caseIndex]}
+            headingRef={primaryHeadingRef}
+            isFinalCase={caseIndex === CASES.length - 1}
             key={CASES[caseIndex].id}
             onComplete={completeCase}
           />

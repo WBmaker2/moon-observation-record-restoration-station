@@ -1,21 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type Ref } from "react";
 import { PHASES } from "../data/phases";
 import { judgeAnswer } from "../domain/judge";
-import type { Certainty, PhaseId, RestorationCase } from "../domain/types";
+import type {
+  CaseAnswer,
+  Certainty,
+  PhaseId,
+  RestorationCase,
+  TrendChoiceId,
+} from "../domain/types";
 import { MoonPhase } from "./MoonPhase";
 import { ObservationBoard } from "./ObservationBoard";
 
 type CaseWorkspaceProps = {
   caseData: RestorationCase;
-  onComplete: (caseId: string) => void;
+  headingRef?: Ref<HTMLHeadingElement>;
+  isFinalCase?: boolean;
+  onComplete: (caseId: string, answer: CaseAnswer) => void;
 };
 
 type Draft = {
   orderConfirmed: boolean;
   candidateIds: PhaseId[];
   evidenceIds: string[];
+  trendId: TrendChoiceId | null;
   certainty: Certainty | null;
 };
 
@@ -23,6 +32,7 @@ const emptyDraft: Draft = {
   orderConfirmed: false,
   candidateIds: [],
   evidenceIds: [],
+  trendId: null,
   certainty: null,
 };
 
@@ -36,10 +46,16 @@ function toggleId<T extends string>(ids: T[], id: T) {
   return ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id];
 }
 
-export function CaseWorkspace({ caseData, onComplete }: CaseWorkspaceProps) {
+export function CaseWorkspace({
+  caseData,
+  headingRef,
+  isFinalCase = false,
+  onComplete,
+}: CaseWorkspaceProps) {
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [feedback, setFeedback] = useState<string[]>([]);
   const [completed, setCompleted] = useState(false);
+  const [completedAnswer, setCompletedAnswer] = useState<CaseAnswer | null>(null);
   const isMultipleCase = caseData.certainty === "multiple-possible";
   const evidenceReady = ["before", "after"].every((side) =>
     caseData.evidence.some(
@@ -63,6 +79,7 @@ export function CaseWorkspace({ caseData, onComplete }: CaseWorkspaceProps) {
       ...current,
       candidateIds,
       evidenceIds: [],
+      trendId: null,
       certainty: null,
     }));
     setFeedback([]);
@@ -77,16 +94,18 @@ export function CaseWorkspace({ caseData, onComplete }: CaseWorkspaceProps) {
   }
 
   function submitRestoration() {
-    const result = judgeAnswer(caseData, {
+    const answer: CaseAnswer = {
       candidateIds: draft.candidateIds,
       evidenceIds: draft.evidenceIds,
+      trendId: draft.trendId,
       certainty: draft.certainty ?? "not-enough-information",
-    });
+    };
+    const result = judgeAnswer(caseData, answer);
 
     if (result.complete) {
       setCompleted(true);
+      setCompletedAnswer(answer);
       setFeedback([caseData.successCopy]);
-      onComplete(caseData.id);
       return;
     }
 
@@ -104,16 +123,23 @@ export function CaseWorkspace({ caseData, onComplete }: CaseWorkspaceProps) {
     if (!result.after) {
       nextFeedback.push("뒤 기록을 근거로 하나 이상 골라 보세요.");
     }
+    if (!result.trend) {
+      nextFeedback.push("앞뒤 기록에서 밝게 보이는 부분이 어떻게 변하는지 골라 보세요.");
+    }
     if (!result.certainty) {
       nextFeedback.push("이 기록을 하나로 정할 수 있는지 판단을 골라 보세요.");
     }
     setFeedback(nextFeedback);
   }
 
+  function advanceToNextCase() {
+    if (completedAnswer) onComplete(caseData.id, completedAnswer);
+  }
+
   return (
     <section aria-labelledby={`${caseData.id}-title`} className="case-workspace">
       <p>복원 사건</p>
-      <h1 id={`${caseData.id}-title`}>{caseData.title}</h1>
+      <h1 id={`${caseData.id}-title`} ref={headingRef} tabIndex={-1}>{caseData.title}</h1>
       <p>{caseData.intervalGuide}</p>
 
       <section aria-labelledby={`${caseData.id}-records`}>
@@ -165,7 +191,26 @@ export function CaseWorkspace({ caseData, onComplete }: CaseWorkspaceProps) {
       </fieldset>
 
       <fieldset disabled={!evidenceReady || completed}>
-        <legend>4. 이 기록을 얼마나 확실하게 복원할 수 있나요?</legend>
+        <legend>4. 밝게 보이는 부분의 변화 방향을 골라요</legend>
+        {caseData.trendChoices.map((choice) => (
+          <label key={choice.id}>
+            <input
+              aria-label={`변화 방향: ${choice.label}`}
+              checked={draft.trendId === choice.id}
+              name={`${caseData.id}-trend`}
+              onChange={() => {
+                setDraft((current) => ({ ...current, trendId: choice.id }));
+                setFeedback([]);
+              }}
+              type="radio"
+            />
+            {choice.label}
+          </label>
+        ))}
+      </fieldset>
+
+      <fieldset disabled={!evidenceReady || !draft.trendId || completed}>
+        <legend>5. 이 기록을 얼마나 확실하게 복원할 수 있나요?</legend>
         {certaintyOptions.map((option) => (
           <label key={option.id}>
             <input
@@ -196,6 +241,11 @@ export function CaseWorkspace({ caseData, onComplete }: CaseWorkspaceProps) {
           {feedback.map((message) => (
             <p key={message}>{message}</p>
           ))}
+          {completed && completedAnswer ? (
+            <button onClick={advanceToNextCase} type="button">
+              {isFinalCase ? "전체 복원 파일 보기" : "다음 사건으로"}
+            </button>
+          ) : null}
         </section>
       ) : null}
     </section>
