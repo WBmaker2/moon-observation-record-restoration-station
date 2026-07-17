@@ -2,8 +2,8 @@ import type { PhaseId, RestorationCase, TrendChoice } from "../domain/types";
 import { PHASES } from "./phases";
 
 const TREND_CHOICES: TrendChoice[] = [
-  { id: "growing", label: "밝은 부분이 커지는 중이에요" },
-  { id: "shrinking", label: "밝은 부분이 작아지는 중이에요" },
+  { id: "growing", label: "지구에서 밝게 보이는 부분이 커지는 중이에요" },
+  { id: "shrinking", label: "지구에서 밝게 보이는 부분이 작아지는 중이에요" },
   { id: "turning-full", label: "보름 무렵에서 방향이 바뀌어요" },
   { id: "insufficient-data", label: "기록만으로 하나를 정하기 어려워요" },
 ];
@@ -22,13 +22,13 @@ const risingGapCase: RestorationCase = {
   candidateIds: ["first-quarter", "full", "third-quarter"],
   acceptedCandidateSets: [["first-quarter"]],
   evidence: [
-    { id: "rising-before-growing", side: "before", label: "앞 기록보다 밝은 부분이 커요." },
-    { id: "rising-after-less", side: "after", label: "뒤 기록보다는 밝은 부분이 적어요." },
+    { id: "rising-before-growing", side: "before", label: "앞 기록보다 지구에서 밝게 보이는 부분이 커요." },
+    { id: "rising-after-less", side: "after", label: "뒤 기록보다는 지구에서 밝게 보이는 부분이 적어요." },
   ],
   certainty: "one-best",
   trendChoices: TREND_CHOICES,
   successCopy: "앞뒤 기록을 모두 사용해 상현 무렵 반달로 복원했어요.",
-  retryCopy: "밝은 쪽의 방향 하나가 아니라, 앞뒤 기록에서 밝은 부분이 어떻게 변하는지 살펴보세요.",
+  retryCopy: "밝은 쪽의 방향 하나가 아니라, 앞뒤 기록을 보고 지구에서 밝게 보이는 부분이 어떻게 변하는지 살펴보세요.",
 };
 
 const afterFullCase: RestorationCase = {
@@ -43,12 +43,12 @@ const afterFullCase: RestorationCase = {
   candidateIds: ["waxing-gibbous", "waning-gibbous", "waning-crescent"],
   acceptedCandidateSets: [["waning-gibbous"]],
   evidence: [
-    { id: "after-full-before-shrinking", side: "before", label: "보름 뒤에는 밝은 부분이 작아지는 흐름이에요." },
-    { id: "after-full-after-more", side: "after", label: "뒤의 반달보다 밝게 보이는 부분이 많아요." },
+    { id: "after-full-before-shrinking", side: "before", label: "보름 뒤에는 지구에서 밝게 보이는 부분이 작아지는 흐름이에요." },
+    { id: "after-full-after-more", side: "after", label: "뒤의 반달보다 지구에서 밝게 보이는 부분이 많아요." },
   ],
   certainty: "one-best",
   trendChoices: TREND_CHOICES,
-  successCopy: "보름 뒤에는 밝게 보이는 부분이 작아져요. 이 기록은 보름 뒤 이지러지는 달이에요.",
+  successCopy: "보름 뒤에는 지구에서 밝게 보이는 부분이 작아져요. 이 기록은 보름 뒤 이지러지는 달이에요.",
   retryCopy: "달 자체가 작아지는 것이 아니에요. 지구에서 밝게 보이는 부분의 변화를 비교해 보세요.",
 };
 
@@ -64,12 +64,12 @@ const fullTurnCase: RestorationCase = {
   candidateIds: ["first-quarter", "full", "third-quarter"],
   acceptedCandidateSets: [["full"]],
   evidence: [
-    { id: "full-turn-before-growing", side: "before", label: "앞 기록에서는 보름을 향해 밝은 부분이 커져요." },
-    { id: "full-turn-after-shrinking", side: "after", label: "뒤 기록에서는 보름을 지나 밝은 부분이 작아져요." },
+    { id: "full-turn-before-growing", side: "before", label: "앞 기록에서는 보름을 향해 지구에서 밝게 보이는 부분이 커져요." },
+    { id: "full-turn-after-shrinking", side: "after", label: "뒤 기록에서는 보름을 지나 지구에서 밝게 보이는 부분이 작아져요." },
   ],
   certainty: "one-best",
   trendChoices: TREND_CHOICES,
-  successCopy: "보름달은 밝은 부분이 커지는 흐름과 작아지는 흐름이 바뀌는 대표 지점이에요.",
+  successCopy: "보름달은 지구에서 밝게 보이는 부분이 커지는 흐름과 작아지는 흐름이 바뀌는 대표 지점이에요.",
   retryCopy: "앞 기록과 뒤 기록의 변화 방향을 함께 읽어 보세요. 보름 무렵에서는 방향이 바뀔 수 있어요.",
 };
 
@@ -135,6 +135,12 @@ export function validateCases(cases: RestorationCase[]): string[] {
   if (cases.length !== 5) {
     errors.push("MVP는 복원 사건을 정확히 다섯 개 제공해야 합니다.");
   }
+  if (
+    cases.filter((caseData) => caseData.certainty === "one-best").length !== 4 ||
+    cases.filter((caseData) => caseData.certainty === "multiple-possible").length !== 1
+  ) {
+    errors.push("MVP는 단일 답 사건 4개와 복수 가능 답 사건 1개를 제공해야 합니다.");
+  }
 
   const ids = new Set<string>();
   for (const caseData of cases) {
@@ -174,8 +180,12 @@ export function validateCases(cases: RestorationCase[]): string[] {
       errors.push(`${prefix} 허용 후보는 후보 목록의 부분집합이어야 합니다.`);
     }
 
-    if (caseData.certainty === "one-best" && caseData.acceptedCandidateSets.some((set) => set.length !== 1)) {
-      errors.push(`${prefix} 단일 답 사건의 허용 후보 집합은 하나의 후보여야 합니다.`);
+    if (
+      caseData.certainty === "one-best" &&
+      (caseData.acceptedCandidateSets.length !== 1 ||
+        caseData.acceptedCandidateSets[0].length !== 1)
+    ) {
+      errors.push(`${prefix} 단일 답 사건은 허용 후보 집합을 정확히 하나 제공해야 합니다.`);
     }
     if (caseData.certainty === "multiple-possible" && !caseData.acceptedCandidateSets.some((set) => set.length >= 2)) {
       errors.push(`${prefix} 복수 가능 사건은 두 개 이상 후보를 함께 허용해야 합니다.`);

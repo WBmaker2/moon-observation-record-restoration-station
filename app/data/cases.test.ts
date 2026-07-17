@@ -43,6 +43,18 @@ describe("CASES", () => {
     expect(caseData.retryCopy).toContain("구름");
     expect(caseData.retryCopy).toContain("달이 없었다는 뜻은 아니에요");
   });
+
+  it("학생에게 밝은 부분을 설명할 때 지구에서 보이는 모습이라고 말한다", () => {
+    const studentCopy = CASES.flatMap((caseData) => [
+      ...caseData.trendChoices.map((choice) => choice.label),
+      ...caseData.evidence.map((evidence) => evidence.label),
+      caseData.successCopy,
+      caseData.retryCopy,
+    ]);
+
+    expect(studentCopy.join(" ")).toContain("지구에서 밝게 보이는 부분");
+    expect(studentCopy.join(" ")).not.toContain("밝은 부분");
+  });
 });
 
 describe("validateCases", () => {
@@ -87,6 +99,24 @@ describe("validateCases", () => {
         "rising-gap: missing-record 기록에는 phaseId가 없어야 합니다.",
         "rising-gap: 앞과 뒤 근거를 각각 하나씩 제공해야 합니다.",
       ]),
+    );
+  });
+
+  it("단일 답 넷과 복수 가능 답 하나가 아닌 사건 구성을 거절한다", () => {
+    const invalidCases = structuredClone(CASES);
+    invalidCases[0].certainty = "multiple-possible";
+
+    expect(validateCases(invalidCases)).toContain(
+      "MVP는 단일 답 사건 4개와 복수 가능 답 사건 1개를 제공해야 합니다.",
+    );
+  });
+
+  it("단일 답 사건에 여러 허용 후보 집합이 있으면 거절한다", () => {
+    const invalidCases = structuredClone(CASES);
+    invalidCases[0].acceptedCandidateSets = [["first-quarter"], ["full"]];
+
+    expect(validateCases(invalidCases)).toContain(
+      "rising-gap: 단일 답 사건은 허용 후보 집합을 정확히 하나 제공해야 합니다.",
     );
   });
 });
