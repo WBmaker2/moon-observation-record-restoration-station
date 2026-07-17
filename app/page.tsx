@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { AppHeader } from "./components/AppHeader";
 import { CaseWorkspace } from "./components/CaseWorkspace";
 import { GuidePanel } from "./components/GuidePanel";
+import { ResultSummary } from "./components/ResultSummary";
 import { CASES } from "./data/cases";
 
 export default function Home() {
@@ -17,29 +19,26 @@ export default function Home() {
     setCaseIndex((current) => Math.min(current + 1, CASES.length));
   }
 
-  if (!modelGuideConfirmed) {
-    return <GuidePanel onConfirm={() => setModelGuideConfirmed(true)} />;
-  }
-
-  if (caseIndex >= CASES.length) {
-    return (
-      <main>
-        <h1>모든 달 기록을 복원했어요</h1>
-        <p>{completedCaseIds.length}개의 사건에서 앞뒤 기록을 모두 살폈어요.</p>
-      </main>
-    );
-  }
-
   return (
-    <main>
-      <p aria-label={`완료한 사건 ${completedCaseIds.length}개`}>
-        사건 {caseIndex + 1} / {CASES.length}
-      </p>
-      <CaseWorkspace
-        caseData={CASES[caseIndex]}
-        key={CASES[caseIndex].id}
-        onComplete={completeCase}
+    <>
+      <AppHeader
+        completedCount={completedCaseIds.length}
+        currentCaseNumber={Math.min(caseIndex + 1, CASES.length)}
+        totalCases={CASES.length}
       />
-    </main>
+      <main>
+        {!modelGuideConfirmed ? (
+          <GuidePanel onConfirm={() => setModelGuideConfirmed(true)} />
+        ) : caseIndex >= CASES.length ? (
+          <ResultSummary cases={CASES} completedCaseIds={completedCaseIds} />
+        ) : (
+          <CaseWorkspace
+            caseData={CASES[caseIndex]}
+            key={CASES[caseIndex].id}
+            onComplete={completeCase}
+          />
+        )}
+      </main>
+    </>
   );
 }
