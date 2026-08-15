@@ -16,6 +16,12 @@ const modelLimits = [
   "이 카드는 실제 날짜의 달을 알려 주는 달력이나 예보가 아니에요.",
 ];
 
+function getPhaseHint(phaseId: string) {
+  if (phaseId === "waxing-crescent") return "오른쪽에 얇은 밝은 부분이 있어요.";
+  if (phaseId === "waxing-gibbous") return "밝은 부분이 대부분이고 어두운 가장자리가 조금 남아요.";
+  return null;
+}
+
 export function GuidePanel({ onConfirm }: GuidePanelProps) {
   const [confirmedLimits, setConfirmedLimits] = useState<string[]>([]);
   const allLimitsConfirmed = confirmedLimits.length === modelLimits.length;
@@ -42,6 +48,7 @@ export function GuidePanel({ onConfirm }: GuidePanelProps) {
           <li key={phase.id}>
             <MoonPhase phaseId={phase.id} size={56} />
             <span>{phase.studentName}</span>
+            {getPhaseHint(phase.id) ? <small>{getPhaseHint(phase.id)}</small> : null}
           </li>
         ))}
       </ol>

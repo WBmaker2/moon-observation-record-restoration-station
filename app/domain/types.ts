@@ -12,6 +12,8 @@ export type PhaseId =
 
 export type PhaseOrder = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type BrightnessRank = 0 | 1 | 2 | 3 | 4;
+export type MoonOrientation = "northern" | "southern";
+export type LitSide = "none" | "right" | "left" | "both";
 
 export interface Phase {
   id: PhaseId;
@@ -19,6 +21,8 @@ export interface Phase {
   studentName: string;
   scienceName: string;
   brightnessRank: BrightnessRank;
+  illuminationFraction: number;
+  litSide: LitSide;
   trend: Trend;
   svgMaskId: string;
   textAlternative: string;
