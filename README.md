@@ -97,3 +97,13 @@ actions tied to the current ChatGPT user. Leave public content anonymous.
 
 - [vinext Documentation](https://github.com/cloudflare/vinext)
 - [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+
+## GitHub Pages
+
+이 프로젝트는 브라우저 메모리에서만 관측 기록을 복원하는 정적 학습 앱으로
+GitHub Pages에서도 사용할 수 있습니다.
+
+- `npm run build:pages`: GitHub Pages용 정적 사이트 빌드
+- 공개 주소: https://wbmaker2.github.io/moon-observation-record-restoration-station/
+- 배포 방식: `.github/workflows/deploy-pages.yml`
+- 정적 진입점: `pages/index.html`

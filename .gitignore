@@ -37,8 +37,12 @@ yarn-error.log*
 # typescript
 next-env.d.ts
 /dist/
+/tsconfig.tsbuildinfo
 /.wrangler/
 /outputs/
 /work/
+/.gstack/
+/dist-pages/
+/.playwright-cli/
 /.superpowers/
 .gstack/
