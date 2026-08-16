@@ -67,7 +67,12 @@ export function GuidePanel({ onConfirm }: GuidePanelProps) {
         ))}
       </fieldset>
 
-      <button disabled={!allLimitsConfirmed} onClick={onConfirm} type="button">
+      <button
+        className={allLimitsConfirmed ? "gi-pulse" : undefined}
+        disabled={!allLimitsConfirmed}
+        onClick={onConfirm}
+        type="button"
+      >
         대표 모형 안내 확인
       </button>
     </section>

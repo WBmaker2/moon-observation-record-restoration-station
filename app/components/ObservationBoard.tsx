@@ -27,10 +27,12 @@ export function ObservationBoard({ observations }: ObservationBoardProps) {
   );
 
   return (
-    <ol aria-label="날짜순 관측 기록" className="observation-board">
-      {orderedObservations.map((observation) => (
+    <ol aria-label="날짜 순서와 간격에 따른 관측 기록" className="observation-board">
+      {orderedObservations.map((observation, index) => (
         <li className="observation-board__item" key={observation.id}>
-          <p className="observation-board__day">{observation.relativeDay + 1}일째</p>
+          <p className="observation-board__day">
+            {index === 0 ? "첫 관측" : `${observation.relativeDay}일 뒤`}
+          </p>
           {observation.status === "observed" ? (
             observation.phaseId ? (
               <ObservedMoon phaseId={observation.phaseId} />

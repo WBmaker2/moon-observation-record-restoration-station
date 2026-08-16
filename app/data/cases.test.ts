@@ -59,6 +59,15 @@ describe("CASES", () => {
     expect(caseData.retryCopy).toContain("다른 모양");
   });
 
+  it("대표 위상 기록은 연속된 하루가 아니라 며칠 간격을 사용한다", () => {
+    for (const caseData of CASES) {
+      const observedDays = caseData.observations.map((item) => item.relativeDay);
+
+      expect(observedDays[2] - observedDays[0]).toBeGreaterThanOrEqual(3);
+      expect(caseData.intervalGuide).toMatch(/\d+일 뒤/);
+    }
+  });
+
   it("구름 사건은 관측 실패와 복원 추론을 구분한다", () => {
     const caseData = CASES[3];
     const cloudyObservation = caseData.observations.find(

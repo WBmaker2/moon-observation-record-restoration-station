@@ -62,6 +62,12 @@ export function CaseWorkspace({
       (item) => item.side === side && draft.evidenceIds.includes(item.id),
     ),
   );
+  const restorationReady =
+    draft.orderConfirmed &&
+    draft.candidateIds.length > 0 &&
+    evidenceReady &&
+    draft.trendId !== null &&
+    draft.certainty !== null;
 
   function chooseCandidate(candidateId: PhaseId) {
     const candidateIds = isMultipleCase
@@ -117,11 +123,12 @@ export function CaseWorkspace({
           : caseData.retryCopy,
       );
     }
-    if (!result.before) {
-      nextFeedback.push("앞 기록을 근거로 하나 이상 골라 보세요.");
-    }
-    if (!result.after) {
-      nextFeedback.push("뒤 기록을 근거로 하나 이상 골라 보세요.");
+    if (!result.before && !result.after) {
+      nextFeedback.push("앞 기록 근거 1개와 뒤 기록 근거 1개를 골라야 해요.");
+    } else if (!result.before) {
+      nextFeedback.push("앞 기록 근거 1개를 골라야 해요.");
+    } else if (!result.after) {
+      nextFeedback.push("뒤 기록 근거 1개를 골라야 해요.");
     }
     if (!result.trend) {
       nextFeedback.push("앞뒤 기록에서 밝게 보이는 부분이 어떻게 변하는지 골라 보세요.");
@@ -140,12 +147,16 @@ export function CaseWorkspace({
     <section aria-labelledby={`${caseData.id}-title`} className="case-workspace">
       <p>복원 사건</p>
       <h1 id={`${caseData.id}-title`} ref={headingRef} tabIndex={-1}>{caseData.title}</h1>
-      <p>{caseData.intervalGuide}</p>
+      <aside className="case-workspace__interval" aria-label="시간 힌트">
+        <strong>시간 힌트</strong>
+        <p>{caseData.intervalGuide}</p>
+      </aside>
 
       <section aria-labelledby={`${caseData.id}-records`}>
         <h2 id={`${caseData.id}-records`}>1. 날짜 순서와 빈 기록을 찾아요</h2>
         <ObservationBoard observations={caseData.observations} />
         <button
+          className={!draft.orderConfirmed && !completed ? "gi-pulse" : undefined}
           disabled={draft.orderConfirmed || completed}
           onClick={() => setDraft((current) => ({ ...current, orderConfirmed: true }))}
           type="button"
@@ -156,6 +167,11 @@ export function CaseWorkspace({
 
       <fieldset disabled={!draft.orderConfirmed || completed}>
         <legend>2. 빈 기록에 들어갈 대표 모양을 골라요</legend>
+        <p className="choice-help">
+          {isMultipleCase
+            ? "맞을 수 있는 모양을 모두 골라요."
+            : "앞뒤 달 모양 사이에 들어갈 수 있는 모양을 골라요. 하나만 고를 수 있어요."}
+        </p>
         {caseData.candidateIds.map((candidateId) => {
           const phase = PHASES.find((item) => item.id === candidateId);
           if (!phase) return null;
@@ -178,13 +194,17 @@ export function CaseWorkspace({
 
       <fieldset disabled={draft.candidateIds.length === 0 || completed}>
         <legend>3. 앞 기록과 뒤 기록을 근거로 골라요</legend>
+        <p className="choice-help">앞 기록에서 하나, 뒤 기록에서 하나를 골라 근거를 모아요.</p>
         {caseData.evidence.map((evidence) => (
-          <label key={evidence.id}>
+          <label key={evidence.id} aria-label={evidence.label}>
             <input
               checked={draft.evidenceIds.includes(evidence.id)}
               onChange={() => toggleEvidence(evidence.id)}
               type="checkbox"
             />
+            <span className="evidence-side" aria-hidden="true">
+              {evidence.side === "before" ? "앞 기록" : "뒤 기록"}
+            </span>
             {evidence.label}
           </label>
         ))}
@@ -192,6 +212,7 @@ export function CaseWorkspace({
 
       <fieldset disabled={!evidenceReady || completed}>
         <legend>4. 밝게 보이는 부분의 변화 방향을 골라요</legend>
+        <p className="choice-help">앞뒤 기록을 비교해 밝은 부분이 커지는지 작아지는지 살펴봐요.</p>
         {caseData.trendChoices.map((choice) => (
           <label key={choice.id}>
             <input
@@ -211,6 +232,7 @@ export function CaseWorkspace({
 
       <fieldset disabled={!evidenceReady || !draft.trendId || completed}>
         <legend>5. 이 기록을 얼마나 확실하게 복원할 수 있나요?</legend>
+        <p className="choice-help">내가 고른 답을 얼마나 믿을 수 있는지 골라요.</p>
         {certaintyOptions.map((option) => (
           <label key={option.id}>
             <input
@@ -228,6 +250,7 @@ export function CaseWorkspace({
       </fieldset>
 
       <button
+        className={restorationReady && !completed ? "gi-pulse" : undefined}
         disabled={!draft.orderConfirmed || completed}
         onClick={submitRestoration}
         type="button"
@@ -242,7 +265,7 @@ export function CaseWorkspace({
             <p key={message}>{message}</p>
           ))}
           {completed && completedAnswer ? (
-            <button onClick={advanceToNextCase} type="button">
+            <button className="gi-pulse" onClick={advanceToNextCase} type="button">
               {isFinalCase ? "전체 복원 파일 보기" : "다음 사건으로"}
             </button>
           ) : null}

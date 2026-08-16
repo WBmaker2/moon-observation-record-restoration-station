@@ -13,11 +13,11 @@ const orientation = "normalized-northern-model" as const;
 const risingGapCase: RestorationCase = {
   id: "rising-gap",
   title: "차오르는 기록의 빈칸",
-  intervalGuide: "앞뒤 기록은 교육용 대표 간격이 비슷해요.",
+  intervalGuide: "첫 기록에서 3일 뒤가 빈 기록이고, 7일 뒤에 다음 기록이 있어요.",
   observations: [
     { id: "rising-before", relativeDay: 0, status: "observed", phaseId: "waxing-crescent", weatherNote: "clear", orientation },
-    { id: "rising-gap", relativeDay: 1, status: "missing-record", phaseId: null, orientation },
-    { id: "rising-after", relativeDay: 2, status: "observed", phaseId: "waxing-gibbous", weatherNote: "clear", orientation },
+    { id: "rising-gap", relativeDay: 3, status: "missing-record", phaseId: null, orientation },
+    { id: "rising-after", relativeDay: 7, status: "observed", phaseId: "waxing-gibbous", weatherNote: "clear", orientation },
   ],
   candidateIds: ["first-quarter", "full", "third-quarter"],
   acceptedCandidateSets: [["first-quarter"]],
@@ -35,11 +35,11 @@ const risingGapCase: RestorationCase = {
 const afterFullCase: RestorationCase = {
   id: "after-full",
   title: "보름 뒤 기록의 빈칸",
-  intervalGuide: "앞뒤 기록은 교육용 대표 간격이 비슷해요.",
+  intervalGuide: "첫 기록에서 3일 뒤가 빈 기록이고, 7일 뒤에 다음 기록이 있어요.",
   observations: [
     { id: "after-full-before", relativeDay: 0, status: "observed", phaseId: "full", weatherNote: "clear", orientation },
-    { id: "after-full-gap", relativeDay: 1, status: "missing-record", phaseId: null, orientation },
-    { id: "after-full-after", relativeDay: 2, status: "observed", phaseId: "third-quarter", weatherNote: "clear", orientation },
+    { id: "after-full-gap", relativeDay: 3, status: "missing-record", phaseId: null, orientation },
+    { id: "after-full-after", relativeDay: 7, status: "observed", phaseId: "third-quarter", weatherNote: "clear", orientation },
   ],
   candidateIds: ["waxing-gibbous", "waning-gibbous", "waning-crescent"],
   acceptedCandidateSets: [["waning-gibbous"]],
@@ -57,11 +57,11 @@ const afterFullCase: RestorationCase = {
 const fullTurnCase: RestorationCase = {
   id: "full-turn",
   title: "방향이 바뀌는 밤",
-  intervalGuide: "앞뒤 기록은 보름 무렵을 사이에 둔 교육용 대표 간격이에요.",
+  intervalGuide: "앞 기록에서 4일 뒤가 빈 기록이고, 8일 뒤에 다음 기록이 있어요.",
   observations: [
     { id: "full-turn-before", relativeDay: 0, status: "observed", phaseId: "waxing-gibbous", weatherNote: "clear", orientation },
-    { id: "full-turn-gap", relativeDay: 1, status: "missing-record", phaseId: null, orientation },
-    { id: "full-turn-after", relativeDay: 2, status: "observed", phaseId: "waning-gibbous", weatherNote: "clear", orientation },
+    { id: "full-turn-gap", relativeDay: 4, status: "missing-record", phaseId: null, orientation },
+    { id: "full-turn-after", relativeDay: 8, status: "observed", phaseId: "waning-gibbous", weatherNote: "clear", orientation },
   ],
   candidateIds: ["first-quarter", "full", "third-quarter"],
   acceptedCandidateSets: [["full"]],
@@ -79,11 +79,11 @@ const fullTurnCase: RestorationCase = {
 const cloudyCycleCase: RestorationCase = {
   id: "cloudy-cycle",
   title: "구름 뒤에 숨은 기록",
-  intervalGuide: "주기 띠에서 그믐 모양 다음과 밝아지는 초승 모양 사이를 살펴보세요.",
+  intervalGuide: "앞 기록에서 4일 뒤가 구름 때문에 못 본 기록이고, 8일 뒤에 다음 기록이 있어요.",
   observations: [
     { id: "cloudy-before", relativeDay: 0, status: "observed", phaseId: "waning-crescent", weatherNote: "clear", orientation },
-    { id: "cloudy-gap", relativeDay: 1, status: "cloudy", phaseId: null, weatherNote: "cloudy", orientation },
-    { id: "cloudy-after", relativeDay: 2, status: "observed", phaseId: "waxing-crescent", weatherNote: "clear", orientation },
+    { id: "cloudy-gap", relativeDay: 4, status: "cloudy", phaseId: null, weatherNote: "cloudy", orientation },
+    { id: "cloudy-after", relativeDay: 8, status: "observed", phaseId: "waxing-crescent", weatherNote: "clear", orientation },
   ],
   candidateIds: ["new-near", "full", "first-quarter"],
   acceptedCandidateSets: [["new-near"]],
@@ -101,7 +101,7 @@ const cloudyCycleCase: RestorationCase = {
 const multiplePossibleCase: RestorationCase = {
   id: "multiple-possible",
   title: "하나로 정할 수 있을까요?",
-  intervalGuide: "기록 사이의 날짜 간격이 넓어서 대표 모양 하나를 딱 정하기 어려워요.",
+  intervalGuide: "앞 기록에서 6일 뒤가 비어 있고, 12일 뒤에 다음 기록이 있어요. 간격이 넓어 여러 모양이 가능해요.",
   observations: [
     { id: "multiple-before", relativeDay: 0, status: "observed", phaseId: "waxing-crescent", weatherNote: "clear", orientation },
     { id: "multiple-gap", relativeDay: 6, status: "missing-record", phaseId: null, orientation },

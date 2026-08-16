@@ -165,6 +165,7 @@ describe("Home", () => {
     render(<Home />);
 
     fireEvent.click(screen.getByRole("button", { name: "업데이트 내역" }));
+    expect(screen.getByText("2026-08-16 · v1.2.0")).toBeInTheDocument();
     expect(screen.getByText("2026-07-17 · v1.0.1")).toBeInTheDocument();
     expect(screen.getByText("2026-07-17 · v1.0.0")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "닫기" }));

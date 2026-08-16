@@ -6,13 +6,6 @@ import { GuidePanel } from "./GuidePanel";
 
 afterEach(cleanup);
 
-function finishGuide() {
-  for (const checkbox of screen.getAllByRole("checkbox")) {
-    fireEvent.click(checkbox);
-  }
-  fireEvent.click(screen.getByRole("button", { name: "대표 모형 안내 확인" }));
-}
-
 function confirmOrder() {
   fireEvent.click(
     screen.getByRole("button", { name: "날짜 순서 확인했어요" }),
@@ -52,18 +45,56 @@ describe("GuidePanel", () => {
       name: "대표 모형 안내 확인",
     });
     expect(startButton).toBeDisabled();
+    expect(startButton).not.toHaveClass("gi-pulse");
     expect(screen.getAllByRole("checkbox")).toHaveLength(5);
 
-    finishGuide();
+    for (const checkbox of screen.getAllByRole("checkbox")) {
+      fireEvent.click(checkbox);
+    }
+    expect(startButton).toHaveClass("gi-pulse");
+    fireEvent.click(startButton);
 
     expect(onConfirm).toHaveBeenCalledOnce();
   });
 });
 
 describe("CaseWorkspace", () => {
+  it("시간과 선택 단계의 도움말 및 근거 방향 배지를 보여준다", () => {
+    render(<CaseWorkspace caseData={CASES[0]} onComplete={vi.fn()} />);
+
+    expect(screen.getByText("시간 힌트")).toBeInTheDocument();
+    expect(
+      screen.getByText("앞뒤 달 모양 사이에 들어갈 수 있는 모양을 골라요. 하나만 고를 수 있어요."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("앞 기록에서 하나, 뒤 기록에서 하나를 골라 근거를 모아요."),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("앞 기록")).toHaveLength(1);
+    expect(screen.getAllByText("뒤 기록")).toHaveLength(1);
+    expect(
+      screen.getByText("앞뒤 기록을 비교해 밝은 부분이 커지는지 작아지는지 살펴봐요."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("내가 고른 답을 얼마나 믿을 수 있는지 골라요."),
+    ).toBeInTheDocument();
+  });
+
+  it("복수 가능 사건에는 여러 후보 선택 도움말을 보여준다", () => {
+    render(<CaseWorkspace caseData={CASES[4]} onComplete={vi.fn()} />);
+
+    expect(screen.getByText("맞을 수 있는 모양을 모두 골라요.")).toBeInTheDocument();
+  });
+
   it("정답을 확인한 뒤 성공 안내를 유지하고 다음 버튼으로만 완료를 전달한다", () => {
     const onComplete = vi.fn();
     render(<CaseWorkspace caseData={CASES[0]} onComplete={onComplete} />);
+
+    expect(
+      screen.getByRole("button", { name: "날짜 순서 확인했어요" }),
+    ).toHaveClass("gi-pulse");
+    expect(
+      screen.getByRole("button", { name: "복원 확인하기" }),
+    ).not.toHaveClass("gi-pulse");
 
     const candidate = screen.getByRole("radio", {
       name: /상현 무렵 반달/,
@@ -71,11 +102,17 @@ describe("CaseWorkspace", () => {
     expect(candidate).toBeDisabled();
 
     confirmOrder();
+    expect(
+      screen.getByRole("button", { name: "날짜 순서 확인했어요" }),
+    ).not.toHaveClass("gi-pulse");
     fireEvent.click(candidate);
     selectAllEvidence(0);
     selectAcceptedTrend(0);
     fireEvent.click(
       screen.getByRole("radio", { name: "하나가 가장 알맞아요" }),
+    );
+    expect(screen.getByRole("button", { name: "복원 확인하기" })).toHaveClass(
+      "gi-pulse",
     );
     fireEvent.click(screen.getByRole("button", { name: "복원 확인하기" }));
 
@@ -83,7 +120,13 @@ describe("CaseWorkspace", () => {
     expect(screen.getByText(CASES[0].successCopy)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: CASES[0].title })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "다음 사건으로" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "다음 사건으로" })).toHaveClass(
+      "gi-pulse",
+    );
     expect(screen.getByRole("button", { name: "복원 확인하기" })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "복원 확인하기" }),
+    ).not.toHaveClass("gi-pulse");
     expect(candidate).toBeDisabled();
     expect(screen.queryByText(/점수/)).not.toBeInTheDocument();
 
@@ -130,11 +173,14 @@ describe("CaseWorkspace", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "복원 확인하기" }));
     expect(
-      screen.getByText("앞 기록을 근거로 하나 이상 골라 보세요."),
+      screen.getByText("앞 기록 근거 1개와 뒤 기록 근거 1개를 골라야 해요."),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("뒤 기록을 근거로 하나 이상 골라 보세요."),
-    ).toBeInTheDocument();
+      screen.queryByText("앞 기록 근거 1개를 골라야 해요."),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("뒤 기록 근거 1개를 골라야 해요."),
+    ).not.toBeInTheDocument();
   });
 
   it("변화 방향을 빼거나 틀리게 고르면 완료하지 않고 안내한다", () => {
