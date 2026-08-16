@@ -61,10 +61,10 @@ function completeCurrentCase(caseIndex: number) {
           : "하나가 가장 알맞아요",
     }),
   );
-  fireEvent.click(screen.getByRole("button", { name: "복원 확인하기" }));
+  fireEvent.click(screen.getByRole("button", { name: "고른 답 확인하기" }));
   fireEvent.click(
     screen.getByRole("button", {
-      name: caseIndex === CASES.length - 1 ? "전체 복원 파일 보기" : "다음 사건으로",
+      name: caseIndex === CASES.length - 1 ? "전체 달 기록 정리 파일 보기" : "다음 사건으로",
     }),
   );
 }
@@ -91,7 +91,7 @@ describe("Home", () => {
     render(<Home />);
 
     expect(
-      screen.getByText("앞뒤 기록을 살펴 사라진 달 모양을 찾아요"),
+      screen.getByText("앞뒤 기록을 살펴 빈 달 모양을 찾아요"),
     ).toBeInTheDocument();
   });
 
@@ -157,7 +157,7 @@ describe("Home", () => {
     }
 
     expect(
-      screen.getByRole("heading", { name: "달 기록 복원 파일" }),
+      screen.getByRole("heading", { name: "달 기록 정리 파일" }),
     ).toHaveFocus();
   });
 
@@ -165,6 +165,12 @@ describe("Home", () => {
     render(<Home />);
 
     fireEvent.click(screen.getByRole("button", { name: "업데이트 내역" }));
+    expect(screen.getByText("2026-08-16 · v1.3.0")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "빈 기록과 앞·뒤 기록을 비교하는 문장을 더 분명하게 바꾸고, 복원이라는 말을 달 모양 찾기·빈 기록 채우기로 바꿨어요.",
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText("2026-08-16 · v1.2.0")).toBeInTheDocument();
     expect(screen.getByText("2026-07-17 · v1.0.1")).toBeInTheDocument();
     expect(screen.getByText("2026-07-17 · v1.0.0")).toBeInTheDocument();
@@ -175,8 +181,9 @@ describe("Home", () => {
       completeCurrentCase(index);
     }
 
-    expect(screen.getByRole("heading", { name: "달 기록 복원 파일" })).toBeInTheDocument();
-    expect(screen.getByText("5개의 사건을 복원했어요.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "달 기록 정리 파일" })).toBeInTheDocument();
+    expect(screen.getByText("5개의 사건을 해결했어요.")).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "찾아낸 달 기록" })).toBeInTheDocument();
     expect(screen.getAllByText("앞 기록 근거")).toHaveLength(CASES.length);
     expect(screen.getAllByText("뒤 기록 근거")).toHaveLength(CASES.length);
     expect(screen.getAllByText("변화 방향")).toHaveLength(CASES.length);

@@ -22,13 +22,13 @@ const risingGapCase: RestorationCase = {
   candidateIds: ["first-quarter", "full", "third-quarter"],
   acceptedCandidateSets: [["first-quarter"]],
   evidence: [
-    { id: "rising-before-growing", side: "before", label: "앞 기록보다 지구에서 밝게 보이는 부분이 커요." },
-    { id: "rising-after-less", side: "after", label: "뒤 기록보다는 지구에서 밝게 보이는 부분이 적어요." },
+    { id: "rising-before-growing", side: "before", label: "빈 기록은 앞 기록보다 지구에서 밝게 보이는 부분이 더 커요." },
+    { id: "rising-after-less", side: "after", label: "빈 기록은 뒤 기록보다 지구에서 밝게 보이는 부분이 더 적어요." },
   ],
   certainty: "one-best",
   trendChoices: TREND_CHOICES,
   acceptedTrendChoiceIds: ["growing"],
-  successCopy: "앞뒤 기록을 모두 사용해 상현 무렵 반달로 복원했어요.",
+  successCopy: "앞뒤 기록을 모두 사용해 상현 무렵 반달을 찾아냈어요.",
   retryCopy: "밝은 쪽의 방향 하나가 아니라, 앞뒤 기록을 보고 지구에서 밝게 보이는 부분이 어떻게 변하는지 살펴보세요.",
 };
 
@@ -44,8 +44,8 @@ const afterFullCase: RestorationCase = {
   candidateIds: ["waxing-gibbous", "waning-gibbous", "waning-crescent"],
   acceptedCandidateSets: [["waning-gibbous"]],
   evidence: [
-    { id: "after-full-before-shrinking", side: "before", label: "보름 뒤에는 지구에서 밝게 보이는 부분이 작아지는 흐름이에요." },
-    { id: "after-full-after-more", side: "after", label: "뒤의 반달보다 지구에서 밝게 보이는 부분이 많아요." },
+    { id: "after-full-before-shrinking", side: "before", label: "빈 기록은 앞 기록보다 지구에서 밝게 보이는 부분이 더 적어요." },
+    { id: "after-full-after-more", side: "after", label: "빈 기록은 뒤 기록보다 지구에서 밝게 보이는 부분이 더 많아요." },
   ],
   certainty: "one-best",
   trendChoices: TREND_CHOICES,
@@ -66,8 +66,8 @@ const fullTurnCase: RestorationCase = {
   candidateIds: ["first-quarter", "full", "third-quarter"],
   acceptedCandidateSets: [["full"]],
   evidence: [
-    { id: "full-turn-before-growing", side: "before", label: "앞 기록에서는 보름을 향해 지구에서 밝게 보이는 부분이 커져요." },
-    { id: "full-turn-after-shrinking", side: "after", label: "뒤 기록에서는 보름을 지나 지구에서 밝게 보이는 부분이 작아져요." },
+    { id: "full-turn-before-growing", side: "before", label: "빈 기록은 앞 기록보다 지구에서 밝게 보이는 부분이 더 커요." },
+    { id: "full-turn-after-shrinking", side: "after", label: "빈 기록은 뒤 기록보다 지구에서 밝게 보이는 부분이 더 많아요." },
   ],
   certainty: "one-best",
   trendChoices: TREND_CHOICES,
@@ -88,14 +88,14 @@ const cloudyCycleCase: RestorationCase = {
   candidateIds: ["new-near", "full", "first-quarter"],
   acceptedCandidateSets: [["new-near"]],
   evidence: [
-    { id: "cloudy-before-cycle", side: "before", label: "그믐 모양 다음에는 삭 무렵이 와요." },
-    { id: "cloudy-after-cycle", side: "after", label: "삭 무렵 다음에는 밝아지는 초승 모양이 와요." },
+    { id: "cloudy-before-cycle", side: "before", label: "빈 기록은 앞 기록보다 지구에서 밝게 보이는 부분이 더 적어요." },
+    { id: "cloudy-after-cycle", side: "after", label: "빈 기록은 뒤 기록보다 지구에서 밝게 보이는 부분이 더 적어요." },
   ],
   certainty: "one-best",
   trendChoices: TREND_CHOICES,
   acceptedTrendChoiceIds: ["full-turn"],
   successCopy: "그믐 모양과 밝아지는 초승 모양 사이의 대표 모양은 삭 무렵이에요.",
-  retryCopy: "그날은 구름 때문에 관측하지 못했어요. 달이 없었다는 뜻은 아니에요. 앞뒤 순서로 복원해 보세요.",
+  retryCopy: "그날은 구름 때문에 관측하지 못했어요. 달이 없었다는 뜻은 아니에요. 앞뒤 순서로 찾아 넣어 보세요.",
 };
 
 const multiplePossibleCase: RestorationCase = {
@@ -110,8 +110,8 @@ const multiplePossibleCase: RestorationCase = {
   candidateIds: ["waxing-crescent", "first-quarter", "waxing-gibbous"],
   acceptedCandidateSets: [["waxing-crescent", "first-quarter"]],
   evidence: [
-    { id: "multiple-before-gap", side: "before", label: "앞 기록 뒤에 밝아지는 초승 모양도 계속될 수 있어요." },
-    { id: "multiple-after-gap", side: "after", label: "뒤 기록 전에는 상현 무렵 반달도 가능해요." },
+    { id: "multiple-before-gap", side: "before", label: "빈 기록은 앞 기록보다 지구에서 밝게 보이는 부분이 같거나 더 커요." },
+    { id: "multiple-after-gap", side: "after", label: "빈 기록은 뒤 기록보다 지구에서 밝게 보이는 부분이 더 적어요." },
   ],
   certainty: "multiple-possible",
   trendChoices: TREND_CHOICES,

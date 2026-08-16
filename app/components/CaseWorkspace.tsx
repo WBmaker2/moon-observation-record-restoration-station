@@ -145,7 +145,7 @@ export function CaseWorkspace({
 
   return (
     <section aria-labelledby={`${caseData.id}-title`} className="case-workspace">
-      <p>복원 사건</p>
+      <p>달 기록 찾기</p>
       <h1 id={`${caseData.id}-title`} ref={headingRef} tabIndex={-1}>{caseData.title}</h1>
       <aside className="case-workspace__interval" aria-label="시간 힌트">
         <strong>시간 힌트</strong>
@@ -203,7 +203,7 @@ export function CaseWorkspace({
               type="checkbox"
             />
             <span className="evidence-side" aria-hidden="true">
-              {evidence.side === "before" ? "앞 기록" : "뒤 기록"}
+              {evidence.side === "before" ? "앞 기록과 비교" : "뒤 기록과 비교"}
             </span>
             {evidence.label}
           </label>
@@ -231,7 +231,7 @@ export function CaseWorkspace({
       </fieldset>
 
       <fieldset disabled={!evidenceReady || !draft.trendId || completed}>
-        <legend>5. 이 기록을 얼마나 확실하게 복원할 수 있나요?</legend>
+        <legend>5. 빈 기록의 달 모양을 얼마나 확실하게 찾을 수 있나요?</legend>
         <p className="choice-help">내가 고른 답을 얼마나 믿을 수 있는지 골라요.</p>
         {certaintyOptions.map((option) => (
           <label key={option.id}>
@@ -255,18 +255,18 @@ export function CaseWorkspace({
         onClick={submitRestoration}
         type="button"
       >
-        복원 확인하기
+        고른 답 확인하기
       </button>
 
       {feedback.length > 0 ? (
         <section aria-live="polite" className="case-workspace__feedback">
-          <h2>{completed ? "복원 기록 확인" : "다시 근거를 살펴봐요"}</h2>
+          <h2>{completed ? "찾은 답 확인" : "다시 근거를 살펴봐요"}</h2>
           {feedback.map((message) => (
             <p key={message}>{message}</p>
           ))}
           {completed && completedAnswer ? (
             <button className="gi-pulse" onClick={advanceToNextCase} type="button">
-              {isFinalCase ? "전체 복원 파일 보기" : "다음 사건으로"}
+              {isFinalCase ? "전체 달 기록 정리 파일 보기" : "다음 사건으로"}
             </button>
           ) : null}
         </section>

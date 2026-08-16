@@ -90,6 +90,20 @@ describe("CASES", () => {
     expect(studentCopy.join(" ")).toContain("지구에서 밝게 보이는 부분");
     expect(studentCopy.join(" ")).not.toContain("밝은 부분");
   });
+
+  it("모든 근거 문장은 빈 기록을 주어로 분명하게 드러낸다", () => {
+    expect(CASES.flatMap((caseData) => caseData.evidence.map((evidence) => evidence.label))).toEqual(
+      expect.arrayContaining([
+        "빈 기록은 앞 기록보다 지구에서 밝게 보이는 부분이 더 커요.",
+        "빈 기록은 뒤 기록보다 지구에서 밝게 보이는 부분이 더 적어요.",
+      ]),
+    );
+    for (const caseData of CASES) {
+      for (const evidence of caseData.evidence) {
+        expect(evidence.label).toMatch(/^빈 기록은 /);
+      }
+    }
+  });
 });
 
 describe("validateCases", () => {

@@ -58,10 +58,10 @@ export function ResultSummary({ cases, completedCases, headingRef }: ResultSumma
   return (
     <section aria-labelledby="result-summary-title" className="result-summary">
       <p>완료 요약</p>
-      <h1 id="result-summary-title" ref={headingRef} tabIndex={-1}>달 기록 복원 파일</h1>
-      <p>{completedRecords.length}개의 사건을 복원했어요.</p>
+      <h1 id="result-summary-title" ref={headingRef} tabIndex={-1}>달 기록 정리 파일</h1>
+      <p>{completedRecords.length}개의 사건을 해결했어요.</p>
       <p>앞뒤 기록으로 찾은 내용을 다시 살펴볼 수 있어요.</p>
-      <ol aria-label="완료한 복원 기록">
+      <ol aria-label="찾아낸 달 기록">
         {completedRecords.map(({ caseData, answer }) => (
           <li key={caseData.id}>
             <details>
@@ -69,7 +69,7 @@ export function ResultSummary({ cases, completedCases, headingRef }: ResultSumma
               <dl>
                 <dt>원래 기록</dt>
                 <dd>{caseData.observations.map(originalRecord).join(" → ")}</dd>
-                <dt>복원된 기록</dt>
+                <dt>찾아낸 달 모양</dt>
                 <dd>{restoredRecord(answer)}</dd>
                 <dt>앞 기록 근거</dt>
                 <dd>{selectedEvidence(caseData, answer, "before")}</dd>

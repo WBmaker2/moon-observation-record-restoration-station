@@ -37,6 +37,10 @@ const dialogContent = {
     title: "업데이트 내역",
     body: (
       <>
+        <p>2026-08-16 · v1.3.0</p>
+        <ul>
+          <li>빈 기록과 앞·뒤 기록을 비교하는 문장을 더 분명하게 바꾸고, 복원이라는 말을 달 모양 찾기·빈 기록 채우기로 바꿨어요.</li>
+        </ul>
         <p>2026-08-16 · v1.2.0</p>
         <ul>
           <li>관측 사이의 간격과 선택할 수 있는 모양을 더 알기 쉽게 안내해요.</li>
@@ -47,13 +51,13 @@ const dialogContent = {
         </ul>
         <p>2026-07-17 · v1.0.1</p>
         <ul>
-          <li>변화 방향 선택을 복원 과정과 결과 파일에 더했어요.</li>
+          <li>변화 방향 선택을 찾기 과정과 결과 파일에 더했어요.</li>
           <li>정답을 확인한 뒤 다음 사건으로 갈지 직접 고를 수 있어요.</li>
           <li>화면을 바꿀 때 새 제목으로 초점을 옮기고 학습 목표를 더 또렷하게 보여 줘요.</li>
         </ul>
         <p>2026-07-17 · v1.0.0</p>
         <ul>
-          <li>달 관측 기록 복원 사건 5개를 처음 만들었어요.</li>
+          <li>달 관측 기록 찾기 사건 5개를 처음 만들었어요.</li>
           <li>앞뒤 기록으로 가능한 달 모양을 찾고, 여러 답이 가능한 사건도 살펴볼 수 있어요.</li>
         </ul>
       </>
@@ -80,7 +84,7 @@ export function AppHeader({
       <header className="app-header">
         <div>
           <p>달 관측 기록 복원소</p>
-          <p className="app-header__subtitle">앞뒤 기록을 살펴 사라진 달 모양을 찾아요</p>
+          <p className="app-header__subtitle">앞뒤 기록을 살펴 빈 달 모양을 찾아요</p>
           <p aria-live="polite">
             사건 {currentCaseNumber} / {totalCases} · 완료 {completedCount}개
           </p>

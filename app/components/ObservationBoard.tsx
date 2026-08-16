@@ -17,7 +17,7 @@ const statusCopy = {
   },
   "missing-record": {
     title: "빈 관측 기록",
-    detail: "앞뒤 기록을 보고 달 모양을 복원해 보세요.",
+    detail: "앞뒤 기록을 보고 달 모양을 찾아 넣어 보세요.",
   },
 } as const;
 

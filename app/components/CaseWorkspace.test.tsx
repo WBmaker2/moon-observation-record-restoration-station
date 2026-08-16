@@ -69,8 +69,10 @@ describe("CaseWorkspace", () => {
     expect(
       screen.getByText("앞 기록에서 하나, 뒤 기록에서 하나를 골라 근거를 모아요."),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("앞 기록")).toHaveLength(1);
-    expect(screen.getAllByText("뒤 기록")).toHaveLength(1);
+    expect(screen.getByText("빈 기록은 앞 기록보다 지구에서 밝게 보이는 부분이 더 커요.")).toBeInTheDocument();
+    expect(screen.getByText("빈 기록은 뒤 기록보다 지구에서 밝게 보이는 부분이 더 적어요.")).toBeInTheDocument();
+    expect(screen.getByText("앞 기록과 비교")).toBeInTheDocument();
+    expect(screen.getByText("뒤 기록과 비교")).toBeInTheDocument();
     expect(
       screen.getByText("앞뒤 기록을 비교해 밝은 부분이 커지는지 작아지는지 살펴봐요."),
     ).toBeInTheDocument();
@@ -93,7 +95,7 @@ describe("CaseWorkspace", () => {
       screen.getByRole("button", { name: "날짜 순서 확인했어요" }),
     ).toHaveClass("gi-pulse");
     expect(
-      screen.getByRole("button", { name: "복원 확인하기" }),
+      screen.getByRole("button", { name: "고른 답 확인하기" }),
     ).not.toHaveClass("gi-pulse");
 
     const candidate = screen.getByRole("radio", {
@@ -111,10 +113,10 @@ describe("CaseWorkspace", () => {
     fireEvent.click(
       screen.getByRole("radio", { name: "하나가 가장 알맞아요" }),
     );
-    expect(screen.getByRole("button", { name: "복원 확인하기" })).toHaveClass(
+    expect(screen.getByRole("button", { name: "고른 답 확인하기" })).toHaveClass(
       "gi-pulse",
     );
-    fireEvent.click(screen.getByRole("button", { name: "복원 확인하기" }));
+    fireEvent.click(screen.getByRole("button", { name: "고른 답 확인하기" }));
 
     expect(onComplete).not.toHaveBeenCalled();
     expect(screen.getByText(CASES[0].successCopy)).toBeInTheDocument();
@@ -123,9 +125,9 @@ describe("CaseWorkspace", () => {
     expect(screen.getByRole("button", { name: "다음 사건으로" })).toHaveClass(
       "gi-pulse",
     );
-    expect(screen.getByRole("button", { name: "복원 확인하기" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "고른 답 확인하기" })).toBeDisabled();
     expect(
-      screen.getByRole("button", { name: "복원 확인하기" }),
+      screen.getByRole("button", { name: "고른 답 확인하기" }),
     ).not.toHaveClass("gi-pulse");
     expect(candidate).toBeDisabled();
     expect(screen.queryByText(/점수/)).not.toBeInTheDocument();
@@ -171,7 +173,7 @@ describe("CaseWorkspace", () => {
       }),
     ).not.toBeChecked();
 
-    fireEvent.click(screen.getByRole("button", { name: "복원 확인하기" }));
+    fireEvent.click(screen.getByRole("button", { name: "고른 답 확인하기" }));
     expect(
       screen.getByText("앞 기록 근거 1개와 뒤 기록 근거 1개를 골라야 해요."),
     ).toBeInTheDocument();
@@ -198,7 +200,7 @@ describe("CaseWorkspace", () => {
     fireEvent.click(
       screen.getByRole("radio", { name: "하나가 가장 알맞아요" }),
     );
-    fireEvent.click(screen.getByRole("button", { name: "복원 확인하기" }));
+    fireEvent.click(screen.getByRole("button", { name: "고른 답 확인하기" }));
 
     expect(onComplete).not.toHaveBeenCalled();
     expect(
@@ -265,7 +267,7 @@ describe("CaseWorkspace", () => {
     fireEvent.click(
       screen.getByRole("radio", { name: "여러 모양이 가능해요" }),
     );
-    fireEvent.click(screen.getByRole("button", { name: "복원 확인하기" }));
+    fireEvent.click(screen.getByRole("button", { name: "고른 답 확인하기" }));
     fireEvent.click(screen.getByRole("button", { name: "다음 사건으로" }));
 
     expect(onComplete).toHaveBeenCalledWith(

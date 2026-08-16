@@ -20,6 +20,7 @@ describe("ObservationBoard", () => {
       screen.getByRole("list", { name: "날짜 순서와 간격에 따른 관측 기록" }),
     ).toBeInTheDocument();
     expect(screen.getByText("빈 관측 기록")).toBeInTheDocument();
+    expect(screen.getByText("앞뒤 기록을 보고 달 모양을 찾아 넣어 보세요.")).toBeInTheDocument();
     expect(screen.getByText("구름 때문에 관측 못함")).toBeInTheDocument();
     expect(
       screen.getByRole("img", { name: PHASES[1].textAlternative }),

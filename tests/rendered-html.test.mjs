@@ -35,9 +35,9 @@ test("server-renders the finished moon observation learning app", async () => {
   const html = await response.text();
   assert.match(html, /<html[^>]+lang="ko"/i);
   assert.match(html, /<title>달 관측 기록 복원소<\/title>/i);
-  assert.match(html, /앞뒤 관측 기록을 근거로 사라진 달 모양을 복원하는 초등 과학 학습 앱/);
+  assert.match(html, /앞뒤 관측 기록을 근거로 사라진 달 모양을 찾아 넣는 초등 과학 학습 앱/);
   assert.match(html, /대표 달 모형을 먼저 살펴봐요/);
-  assert.match(html, /앞뒤 기록을 살펴 사라진 달 모양을 찾아요/);
+  assert.match(html, /앞뒤 기록을 살펴 빈 달 모양을 찾아요/);
   assert.match(html, /aria-label="안내 메뉴"/);
   assert.match(html, /업데이트 내역/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|Building your site|react-loading-skeleton/i);

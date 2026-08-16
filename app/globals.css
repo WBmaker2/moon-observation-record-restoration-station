@@ -79,7 +79,7 @@ fieldset:disabled { opacity: 0.68; }
 .observation-card { display: grid; align-content: center; justify-items: center; gap: 0.55rem; min-height: 10rem; padding: 0.8rem; border: 2px solid var(--border); border-radius: 0.85rem; background: var(--paper-soft); box-shadow: 0 4px 0 rgb(21 82 139 / 10%); }
 .observation-card--cloudy, .observation-card--not-observed, .observation-card--missing-record, .observation-card--error { align-content: start; justify-items: start; text-align: left; }
 .observation-card--missing-record { border: 3px dashed var(--primary); color: var(--primary); background: #fff0c9; }
-.observation-card--missing-record::before { content: "복원할 빈 기록"; font-size: 0.85rem; font-weight: 900; }
+.observation-card--missing-record::before { content: "빈 기록을 채워요"; font-size: 0.85rem; font-weight: 900; }
 .observation-card--missing-record p:first-child { font-size: 1.1rem; font-weight: 850; }
 
 .case-workspace fieldset label:has(input[type="radio"]), .case-workspace fieldset label:has(input[type="checkbox"]) { border: 2px solid transparent; background: #fffdf7; }
