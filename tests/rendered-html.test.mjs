@@ -43,6 +43,16 @@ test("server-renders the finished moon observation learning app", async () => {
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|Building your site|react-loading-skeleton/i);
 });
 
+test("keeps the static Pages metadata aligned with the student wording", async () => {
+  const html = await readFile(new URL("../pages/index.html", import.meta.url), "utf8");
+
+  assert.match(
+    html,
+    /content="앞뒤 관측 기록을 근거로 사라진 달 모양을 찾아 넣는 초등 과학 학습 앱"/,
+  );
+  assert.match(html, /<title>달 관측 기록 복원소<\/title>/i);
+});
+
 test("derives absolute OG and X card URLs from the request host", async () => {
   const response = await render({
     host: "moon.example.test",

@@ -144,4 +144,4 @@ Expected: lint 오류 0개, Pages 빌드 성공.
 ## Completion Note
 
 - 2026-08-16: 앞·뒤 기록과 빈 기록의 비교 주어를 명시하고, 학생용 “복원” 표현을 달 모양 찾기·빈 기록 채우기 중심으로 바꾸었습니다.
-- 검증: `npm test` (51개), `npm run lint`, `npm run build:pages`, `git diff --check`, 로컬 학생 흐름 브라우저 확인을 완료했습니다.
+- 검증: Vitest 51개와 렌더링 HTML 6개를 포함한 `npm test`, `npm run lint`, `npm run build:pages`, `git diff --check`, 로컬 학생 흐름 브라우저 확인을 완료했습니다. 정적 Pages 메타 설명도 학생용 표현과 맞췄습니다.
