@@ -101,23 +101,23 @@ const cloudyCycleCase: RestorationCase = {
 const multiplePossibleCase: RestorationCase = {
   id: "multiple-possible",
   title: "하나로 정할 수 있을까요?",
-  intervalGuide: "앞 기록에서 6일 뒤가 비어 있고, 12일 뒤에 다음 기록이 있어요. 간격이 넓어 여러 모양이 가능해요.",
+  intervalGuide: "첫 기록에서 6일 뒤가 비어 있고, 12일 뒤에 다음 기록이 있어요. 12일 사이의 가운데인 6일 뒤라 상현 무렵 반달로 생각할 수 있어요.",
   observations: [
     { id: "multiple-before", relativeDay: 0, status: "observed", phaseId: "waxing-crescent", weatherNote: "clear", orientation },
     { id: "multiple-gap", relativeDay: 6, status: "missing-record", phaseId: null, orientation },
     { id: "multiple-after", relativeDay: 12, status: "observed", phaseId: "waxing-gibbous", weatherNote: "clear", orientation },
   ],
   candidateIds: ["waxing-crescent", "first-quarter", "waxing-gibbous"],
-  acceptedCandidateSets: [["waxing-crescent", "first-quarter"]],
+  acceptedCandidateSets: [["first-quarter"]],
   evidence: [
-    { id: "multiple-before-gap", side: "before", label: "빈 기록은 앞 기록보다 지구에서 밝게 보이는 부분이 같거나 더 커요." },
+    { id: "multiple-before-gap", side: "before", label: "빈 기록은 앞 기록보다 지구에서 밝게 보이는 부분이 더 커요." },
     { id: "multiple-after-gap", side: "after", label: "빈 기록은 뒤 기록보다 지구에서 밝게 보이는 부분이 더 적어요." },
   ],
-  certainty: "multiple-possible",
+  certainty: "one-best",
   trendChoices: TREND_CHOICES,
-  acceptedTrendChoiceIds: ["insufficient"],
-  successCopy: "자료가 부족할 때에는 가능한 모양을 여러 개 남기는 것이 더 과학적인 판단이에요.",
-  retryCopy: "자료가 띄엄띄엄 있어요. 다른 모양도 앞뒤 기록과 맞을 수 있어요.",
+  acceptedTrendChoiceIds: ["growing"],
+  successCopy: "첫 기록에서 6일 뒤는 밝게 보이는 부분이 커지는 중간 단계인 상현 무렵 반달이에요.",
+  retryCopy: "첫 기록과 다음 기록 사이의 가운데인 6일 뒤를 생각해 보세요. 밝게 보이는 부분이 커지는 중이고, 답은 상현 무렵 반달 하나예요.",
 };
 
 export const CASES: RestorationCase[] = [
@@ -141,10 +141,10 @@ export function validateCases(cases: RestorationCase[]): string[] {
     errors.push("MVP는 복원 사건을 정확히 다섯 개 제공해야 합니다.");
   }
   if (
-    cases.filter((caseData) => caseData.certainty === "one-best").length !== 4 ||
-    cases.filter((caseData) => caseData.certainty === "multiple-possible").length !== 1
+    cases.filter((caseData) => caseData.certainty === "one-best").length !== 5 ||
+    cases.filter((caseData) => caseData.certainty === "multiple-possible").length !== 0
   ) {
-    errors.push("MVP는 단일 답 사건 4개와 복수 가능 답 사건 1개를 제공해야 합니다.");
+    errors.push("MVP는 단일 답 사건 다섯 개를 제공해야 합니다.");
   }
 
   const ids = new Set<string>();

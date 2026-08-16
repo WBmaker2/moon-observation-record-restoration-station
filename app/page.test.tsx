@@ -23,7 +23,7 @@ function selectAcceptedTrend(caseIndex: number) {
     ["shrinking"],
     ["full-turn"],
     ["full-turn"],
-    ["insufficient"],
+    ["growing"],
   ][caseIndex];
   const trendChoice = CASES[caseIndex].trendChoices.find(
     (choice) => acceptedTrendChoiceIds.includes(choice.id),
@@ -101,6 +101,9 @@ describe("Home", () => {
     const helpButton = screen.getByRole("button", { name: "도움말" });
     fireEvent.click(helpButton);
     expect(screen.getByRole("dialog", { name: "도움말" })).toBeInTheDocument();
+    expect(
+      screen.getByText("시간 간격까지 살펴보고, 가장 알맞은 대표 모양 하나를 골라요."),
+    ).toBeInTheDocument();
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("dialog", { name: "도움말" })).not.toBeInTheDocument();
     expect(helpButton).toHaveFocus();
@@ -108,7 +111,9 @@ describe("Home", () => {
     fireEvent.click(screen.getByRole("button", { name: "교사용 안내" }));
     expect(screen.getByText(/어른이나 선생님과 함께/)).toBeInTheDocument();
     expect(screen.getByText(/태양을 맨눈으로 보거나/)).toBeInTheDocument();
-    expect(screen.getByText(/점수로 매기지 않아요/)).toBeInTheDocument();
+    expect(
+      screen.getByText("이 앱은 앞뒤 기록과 시간 간격을 보고 가장 알맞은 대표 모양 하나를 고르는 연습이에요."),
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "닫기" }));
     expect(screen.getByText("대표 달 모형을 먼저 살펴봐요")).toBeInTheDocument();
   });
@@ -165,6 +170,12 @@ describe("Home", () => {
     render(<Home />);
 
     fireEvent.click(screen.getByRole("button", { name: "업데이트 내역" }));
+    expect(screen.getByText("2026-08-16 · v1.4.0")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "사건 5의 6일 뒤 빈 기록을 12일 사이의 가운데인 상현 무렵 반달 하나로 찾도록 맞췄어요.",
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText("2026-08-16 · v1.3.0")).toBeInTheDocument();
     expect(
       screen.getByText(

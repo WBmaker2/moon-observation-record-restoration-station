@@ -24,7 +24,7 @@ function selectAcceptedTrend(caseIndex: number) {
     ["shrinking"],
     ["full-turn"],
     ["full-turn"],
-    ["insufficient"],
+    ["growing"],
   ][caseIndex];
   const trendChoice = CASES[caseIndex].trendChoices.find(
     (choice) => acceptedTrendChoiceIds.includes(choice.id),
@@ -81,10 +81,14 @@ describe("CaseWorkspace", () => {
     ).toBeInTheDocument();
   });
 
-  it("복수 가능 사건에는 여러 후보 선택 도움말을 보여준다", () => {
+  it("사건 5는 상현 무렵 반달 하나와 6일 가운데 설명을 보여준다", () => {
     render(<CaseWorkspace caseData={CASES[4]} onComplete={vi.fn()} />);
 
-    expect(screen.getByText("맞을 수 있는 모양을 모두 골라요.")).toBeInTheDocument();
+    expect(screen.getByText(/12일 뒤에 다음 기록이 있어요/)).toBeInTheDocument();
+    expect(screen.getByText(/가운데인 6일 뒤/)).toBeInTheDocument();
+    expect(screen.getByText("앞뒤 달 모양 사이에 들어갈 수 있는 모양을 골라요. 하나만 고를 수 있어요.")).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "상현 무렵 반달" })).toBeInTheDocument();
+    expect(screen.queryByRole("checkbox", { name: "상현 무렵 반달" })).not.toBeInTheDocument();
   });
 
   it("정답을 확인한 뒤 성공 안내를 유지하고 다음 버튼으로만 완료를 전달한다", () => {
@@ -249,30 +253,22 @@ describe("CaseWorkspace", () => {
     ).toBeEnabled();
   });
 
-  it("복수 가능 사건은 체크박스로 여러 후보를 골라 완료한다", () => {
+  it("사건 5는 라디오 단일 후보와 성장 방향으로 완료한다", () => {
     const onComplete = vi.fn();
     const caseData = CASES[4];
     render(<CaseWorkspace caseData={caseData} onComplete={onComplete} />);
 
     confirmOrder();
-    for (const candidateId of caseData.acceptedCandidateSets[0]) {
-      const phaseName =
-        candidateId === "waxing-crescent"
-          ? "밝아지는 초승 모양"
-          : "상현 무렵 반달";
-      fireEvent.click(screen.getByRole("checkbox", { name: phaseName }));
-    }
+    fireEvent.click(screen.getByRole("radio", { name: "상현 무렵 반달" }));
     selectAllEvidence(4);
     selectAcceptedTrend(4);
-    fireEvent.click(
-      screen.getByRole("radio", { name: "여러 모양이 가능해요" }),
-    );
+    fireEvent.click(screen.getByRole("radio", { name: "하나가 가장 알맞아요" }));
     fireEvent.click(screen.getByRole("button", { name: "고른 답 확인하기" }));
     fireEvent.click(screen.getByRole("button", { name: "다음 사건으로" }));
 
     expect(onComplete).toHaveBeenCalledWith(
       caseData.id,
-      expect.objectContaining({ trendId: "insufficient" }),
+      expect.objectContaining({ trendId: "growing", certainty: "one-best", candidateIds: ["first-quarter"] }),
     );
   });
 });

@@ -12,11 +12,20 @@ describe("CASES", () => {
     ]);
   });
 
-  it("단일 답 4개와 복수 가능 답 1개를 제공한다", () => {
-    expect(CASES.filter((item) => item.certainty === "one-best")).toHaveLength(4);
+  it("단일 답 다섯 개를 제공한다", () => {
+    expect(CASES.filter((item) => item.certainty === "one-best")).toHaveLength(5);
     expect(
       CASES.filter((item) => item.certainty === "multiple-possible"),
-    ).toHaveLength(1);
+    ).toHaveLength(0);
+  });
+
+  it("사건 5는 6일 뒤 상현 무렵 반달 하나를 정답으로 사용한다", () => {
+    const caseData = CASES[4];
+
+    expect(caseData.observations.map((item) => item.relativeDay)).toEqual([0, 6, 12]);
+    expect(caseData.acceptedCandidateSets).toEqual([["first-quarter"]]);
+    expect(caseData.acceptedTrendChoiceIds).toEqual(["growing"]);
+    expect(caseData.certainty).toBe("one-best");
   });
 
   it("모든 사건은 날짜순 기록, 세 후보, 허용 후보, 앞뒤 근거를 가진다", () => {
@@ -45,18 +54,15 @@ describe("CASES", () => {
       ["shrinking"],
       ["full-turn"],
       ["full-turn"],
-      ["insufficient"],
+      ["growing"],
     ]);
   });
 
-  it("복수 가능 사건은 두 후보를 함께 남기고 자료 부족을 설명한다", () => {
+  it("사건 5는 6일 간격의 가운데를 단일 후보로 설명한다", () => {
     const caseData = CASES[4];
 
-    expect(caseData.acceptedCandidateSets).toEqual([
-      ["waxing-crescent", "first-quarter"],
-    ]);
-    expect(caseData.intervalGuide).toContain("간격");
-    expect(caseData.retryCopy).toContain("다른 모양");
+    expect(caseData.intervalGuide).toContain("가운데인 6일 뒤");
+    expect(caseData.retryCopy).toContain("상현 무렵 반달 하나");
   });
 
   it("대표 위상 기록은 연속된 하루가 아니라 며칠 간격을 사용한다", () => {
@@ -151,12 +157,12 @@ describe("validateCases", () => {
     );
   });
 
-  it("단일 답 넷과 복수 가능 답 하나가 아닌 사건 구성을 거절한다", () => {
+  it("단일 답 다섯 개가 아닌 사건 구성을 거절한다", () => {
     const invalidCases = structuredClone(CASES);
     invalidCases[0].certainty = "multiple-possible";
 
     expect(validateCases(invalidCases)).toContain(
-      "MVP는 단일 답 사건 4개와 복수 가능 답 사건 1개를 제공해야 합니다.",
+      "MVP는 단일 답 사건 다섯 개를 제공해야 합니다.",
     );
   });
 
